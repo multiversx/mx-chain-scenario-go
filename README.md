@@ -19,7 +19,7 @@ The main example for such a runner can be found in the VM, here: https://github.
 
 However, more such runners are conceivable.
 
-To implement such a runner, create an object that implements interface `ScenarioExecutor`.
+To implement such a runner, create an object that implements interface `ScenarioRunner`.
 
 ## Alternate implementation
 

@@ -23,7 +23,7 @@ func DefaultRunScenarioOptions() *RunScenarioOptions {
 }
 
 // RunSingleJSONScenario parses and prepares test, then calls testCallback.
-func (r *ScenarioRunner) RunSingleJSONScenario(contextPath string, options *RunScenarioOptions) error {
+func (r *ScenarioController) RunSingleJSONScenario(contextPath string, options *RunScenarioOptions) error {
 	scenario, parseErr := ParseScenariosScenario(r.Parser, contextPath)
 
 	if parseErr != nil {
@@ -37,5 +37,5 @@ func (r *ScenarioRunner) RunSingleJSONScenario(contextPath string, options *RunS
 
 	applyScenarioOptions(scenario, options)
 
-	return r.Executor.ExecuteScenario(scenario, r.Parser.ExprInterpreter.FileResolver)
+	return r.Executor.RunScenario(scenario, r.Parser.ExprInterpreter.FileResolver)
 }

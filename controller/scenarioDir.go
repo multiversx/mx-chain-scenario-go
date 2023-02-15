@@ -10,8 +10,8 @@ import (
 )
 
 // RunAllJSONScenariosInDirectory walks directory, parses and prepares all json scenarios,
-// then calls scenarioExecutor for each of them.
-func (r *ScenarioRunner) RunAllJSONScenariosInDirectory(
+// then calls ScenarioRunner for each of them.
+func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 	generalTestPath string,
 	specificTestPath string,
 	allowedSuffix string,
