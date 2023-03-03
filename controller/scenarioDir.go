@@ -28,7 +28,7 @@ func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 			if isExcluded(excludedFilePatterns, testFilePath, generalTestPath) {
 				nrSkipped++
 				fmt.Printf("Scenario: %s ... ", shortenTestPath(testFilePath, generalTestPath))
-				fmt.Print("  skip\n")
+				fmt.Printf("  %s\n", color.Ize(color.Yellow, "ok"))
 			} else {
 				r.Executor.Reset()
 				r.RunsNewTest = true
