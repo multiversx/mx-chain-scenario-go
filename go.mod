@@ -3,7 +3,7 @@ module github.com/multiversx/mx-chain-scenario-go
 go 1.17
 
 require (
-	github.com/TwiN/go-color v1.4.0
+	github.com/TwiN/go-color v1.0.0
 	github.com/multiversx/mx-chain-core-go v1.1.30
 	github.com/multiversx/mx-chain-vm-common-go v1.3.33-0.20230123162357-c6f6931a3dec
 	github.com/multiversx/mx-components-big-int v0.1.1
