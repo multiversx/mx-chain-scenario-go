@@ -7,6 +7,8 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/TwiN/go-color"
 )
 
 // RunAllJSONScenariosInDirectory walks directory, parses and prepares all json scenarios,
@@ -26,7 +28,7 @@ func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 			if isExcluded(excludedFilePatterns, testFilePath, generalTestPath) {
 				nrSkipped++
 				fmt.Printf("Scenario: %s ... ", shortenTestPath(testFilePath, generalTestPath))
-				fmt.Print("  skip\n")
+				fmt.Printf("  %s\n", color.Ize(color.Yellow, "ok"))
 			} else {
 				r.Executor.Reset()
 				r.RunsNewTest = true
@@ -34,10 +36,10 @@ func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 				testErr := r.RunSingleJSONScenario(testFilePath, options)
 				if testErr == nil {
 					nrPassed++
-					fmt.Print("  ok\n")
+					fmt.Printf("  %s\n", color.Ize(color.Green, "ok"))
 				} else {
 					nrFailed++
-					fmt.Printf("  FAIL: %s\n", testErr.Error())
+					fmt.Printf("  %s %s\n", color.Ize(color.Red, "FAIL:"), testErr.Error())
 				}
 			}
 		}
