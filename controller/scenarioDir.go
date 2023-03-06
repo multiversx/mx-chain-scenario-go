@@ -25,14 +25,13 @@ func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 
 	err := filepath.Walk(mainDirPath, func(testFilePath string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(testFilePath, allowedSuffix) {
+			fmt.Printf("Scenario: %s ... ", shortenTestPath(testFilePath, generalTestPath))
 			if isExcluded(excludedFilePatterns, testFilePath, generalTestPath) {
 				nrSkipped++
-				fmt.Printf("Scenario: %s ... ", shortenTestPath(testFilePath, generalTestPath))
-				fmt.Printf("  %s\n", color.Ize(color.Yellow, "ok"))
+				fmt.Printf("  %s\n", color.Ize(color.Yellow, "skip"))
 			} else {
 				r.Executor.Reset()
 				r.RunsNewTest = true
-				fmt.Printf("Scenario: %s ... ", shortenTestPath(testFilePath, generalTestPath))
 				testErr := r.RunSingleJSONScenario(testFilePath, options)
 				if testErr == nil {
 					nrPassed++
