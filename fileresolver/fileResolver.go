@@ -13,4 +13,7 @@ type FileResolver interface {
 
 	// ResolveFileValue converts a value prefixed with "file:" and replaces it with the file contents.
 	ResolveFileValue(value string) ([]byte, error)
+
+	// ResolveMxscValue converts a value prefixed with "mxsc:" and replaces it with the file contents.
+	ResolveMxscValue(value string) ([]byte, error)
 }

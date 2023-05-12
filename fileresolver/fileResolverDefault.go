@@ -66,3 +66,17 @@ func (fr *DefaultFileResolver) ResolveFileValue(value string) ([]byte, error) {
 
 	return scCode, nil
 }
+
+// ResolveMxscValue converts a value prefixed with "mxsc:" and replaces it with the json contents.
+func (fr *DefaultFileResolver) ResolveMxscValue(value string) ([]byte, error) {
+	if len(value) == 0 {
+		return []byte{}, nil
+	}
+	fullPath := fr.ResolveAbsolutePath(value)
+	mxscCode, err := ioutil.ReadFile(fullPath)
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return mxscCode, nil
+}

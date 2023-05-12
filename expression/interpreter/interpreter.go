@@ -19,6 +19,7 @@ const addrPrefix = "address:"
 const scAddrPrefix = "sc:"
 
 const filePrefix = "file:"
+const mxscPrefix = "mxsc:"
 const keccak256Prefix = "keccak256:"
 
 const u64Prefix = "u64:"
@@ -98,6 +99,19 @@ func (ei *ExprInterpreter) InterpretSubTree(obj oj.OJsonObject) ([]byte, error) 
 func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 	if len(strRaw) == 0 {
 		return []byte{}, nil
+	}
+
+	// file contents
+	// TODO: make this part of a proper parser
+	if strings.HasPrefix(strRaw, mxscPrefix) {
+		if ei.FileResolver == nil {
+			return []byte{}, errors.New("parser MxscResolver not provided")
+		}
+		fileContents, err := ei.FileResolver.ResolveMxscValue(strRaw[len(filePrefix):])
+		if err != nil {
+			return []byte{}, err
+		}
+		return fileContents, nil
 	}
 
 	// file contents
