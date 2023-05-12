@@ -1,13 +1,23 @@
 package scenfileresolver
 
 import (
+	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"path/filepath"
 )
 
 var _ FileResolver = (*DefaultFileResolver)(nil)
+
+// DefaultMxscResolver loads file contents for the test parser.
+type DefaultMxscResolver struct {
+	code string
+}
+
+// // Implement json.Unmarshaller
+func (d *DefaultMxscResolver) Unmarshal(b []byte) error {
+	return json.Unmarshal(b, &d.code)
+}
 
 // DefaultFileResolver loads file contents for the test parser.
 type DefaultFileResolver struct {
@@ -80,12 +90,16 @@ func (fr *DefaultFileResolver) ResolveMxscValue(value string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, err
 	}
-
-	m := make(map[string]interface{})
-	err1 := json.Unmarshal(mxscJson, &m)
+	mxsc := make(map[string]interface{})
+	err1 := json.Unmarshal([]byte(mxscJson), &mxsc)
 	if err1 != nil {
 		return []byte{}, err1
 	}
-	mxscCode1 := []byte(fmt.Sprint(m["code"]))
-	return mxscCode1, nil
+
+	ret, err := hex.DecodeString(mxsc["code"].(string))
+	if err != nil {
+		return []byte{}, err1
+	}
+
+	return ret, nil
 }
