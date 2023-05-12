@@ -597,6 +597,17 @@ func TestFile(t *testing.T) {
 	require.Equal(t, []byte("hello!"), result)
 }
 
+func TestMxsc(t *testing.T) {
+	ei := mei.ExprInterpreter{
+		FileResolver: fr.NewDefaultFileResolver(),
+	}
+	result, err := ei.InterpretString("mxsc:../../json/integrationTests/example.mxsc.json")
+	require.Nil(t, err)
+
+	expected := []byte("test")
+	require.Equal(t, expected, result)
+}
+
 func TestInterpretSubTree1(t *testing.T) {
 	ei := interpreter()
 	jobj, err := oj.ParseOrderedJSON([]byte(`
