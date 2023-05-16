@@ -100,5 +100,5 @@ type LogEntry struct {
 	Address  JSONCheckBytes
 	Endpoint JSONCheckBytes
 	Topics   JSONCheckValueList
-	Data     JSONCheckBytes
+	Data     JSONCheckValueList
 }
