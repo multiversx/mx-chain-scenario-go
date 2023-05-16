@@ -50,6 +50,11 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 			if err != nil {
 				return nil, fmt.Errorf("invalid account comment: %w", err)
 			}
+		case "update":
+			acct.Update, err = p.parseBool(kvp.Value)
+			if err != nil {
+				return nil, fmt.Errorf("invalid update flag bool: %w", err)
+			}
 		case "shard":
 			acct.Shard, err = p.processUint64(kvp.Value)
 			if err != nil {
@@ -122,12 +127,6 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 			if err != nil {
 				return nil, fmt.Errorf("invalid asyncCallData string: %w", err)
 			}
-		case "update":
-			acct.Update, err = p.parseBool(kvp.Value)
-			if err != nil {
-				return nil, fmt.Errorf("invalid update flag bool: %w", err)
-			}
-
 		case "developerRewards":
 			acct.DeveloperReward, err = p.processBigInt(kvp.Value, bigIntUnsignedBytes)
 			if err != nil {
