@@ -1,7 +1,6 @@
 package scenfileresolver
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
@@ -77,29 +76,4 @@ func (fr *DefaultFileResolver) ResolveFileValue(value string) ([]byte, error) {
 	}
 
 	return scCode, nil
-}
-
-// ResolveMxscValue converts a value prefixed with "mxsc:" and replaces it with the json contents.
-func (fr *DefaultFileResolver) ResolveMxscValue(value string) ([]byte, error) {
-	if len(value) == 0 {
-		return []byte{}, nil
-	}
-	fullPath := fr.ResolveAbsolutePath(value)
-	mxscJson, err := ioutil.ReadFile(fullPath)
-
-	if err != nil {
-		return []byte{}, err
-	}
-	mxsc := make(map[string]interface{})
-	err1 := json.Unmarshal([]byte(mxscJson), &mxsc)
-	if err1 != nil {
-		return []byte{}, err1
-	}
-
-	ret, err := hex.DecodeString(mxsc["code"].(string))
-	if err != nil {
-		return []byte{}, err1
-	}
-
-	return ret, nil
 }

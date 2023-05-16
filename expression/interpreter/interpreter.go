@@ -2,6 +2,7 @@ package scenexpressioninterpreter
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -107,11 +108,23 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 		if ei.FileResolver == nil {
 			return []byte{}, errors.New("parser MxscResolver not provided")
 		}
-		fileContents, err := ei.FileResolver.ResolveMxscValue(strRaw[len(filePrefix):])
+		fileContents, err := ei.FileResolver.ResolveFileValue(strRaw[len(mxscPrefix):])
 		if err != nil {
 			return []byte{}, err
 		}
-		return fileContents, nil
+
+		mxsc := make(map[string]interface{})
+		err1 := json.Unmarshal([]byte(fileContents), &mxsc)
+		if err1 != nil {
+			return []byte{}, err1
+		}
+
+		mxscCode, err := hex.DecodeString(mxsc["code"].(string))
+		if err != nil {
+			return []byte{}, err1
+		}
+
+		return mxscCode, nil
 	}
 
 	// file contents
