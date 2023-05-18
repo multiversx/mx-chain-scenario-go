@@ -63,9 +63,32 @@ func (p *Parser) parseCheckValueList(obj oj.OJsonObject) (mj.JSONCheckValueList,
 	}
 
 	listRaw, listOk := obj.(*oj.OJsonList)
-	if !listOk {
+	if listOk {
+		return p.parseCheckValueJSONList(listRaw)
+	}
+
+	if !p.AllowSingleValueInCheckValueList {
 		return mj.JSONCheckValueList{}, errors.New("not a JSON list")
 	}
+
+	singleValue, err := p.parseCheckBytes(obj)
+	if err != nil {
+		return mj.JSONCheckValueList{}, err
+	}
+
+	if singleValue.OriginalEmpty() {
+		// "" becomes [] instead of [""]
+		return mj.JSONCheckValueList{
+			Values: []mj.JSONCheckBytes{},
+		}, nil
+	}
+
+	return mj.JSONCheckValueList{
+		Values: []mj.JSONCheckBytes{singleValue},
+	}, nil
+}
+
+func (p *Parser) parseCheckValueJSONList(listRaw *oj.OJsonList) (mj.JSONCheckValueList, error) {
 	var values []mj.JSONCheckBytes
 	for _, elemRaw := range listRaw.AsList() {
 		checkBytes, err := p.parseCheckBytes(elemRaw)

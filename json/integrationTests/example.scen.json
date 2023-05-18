@@ -16,6 +16,7 @@
             "accounts": {
                 "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": {
                     "comment": "we can comment on individual account initializations",
+                    "update": true,
                     "nonce": "0",
                     "balance": "0xe8d4a51000",
                     "esdt": {
@@ -237,7 +238,7 @@
                             "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                             "0x1234123400000000000000000000000000000000000000000000000000000004"
                         ],
-                        "data": "0x00"
+                        "data": []
                     },
                     "+"
                 ],
