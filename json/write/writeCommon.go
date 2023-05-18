@@ -47,7 +47,7 @@ func logToOJ(logEntry *mj.LogEntry) oj.OJsonObject {
 	logOJ.Put("address", checkBytesToOJ(logEntry.Address))
 	logOJ.Put("endpoint", checkBytesToOJ(logEntry.Endpoint))
 	logOJ.Put("topics", checkValueListToOJ(logEntry.Topics))
-	logOJ.Put("data", checkBytesToOJ(logEntry.Data))
+	logOJ.Put("data", checkValueListToOJ(logEntry.Data))
 
 	return logOJ
 }

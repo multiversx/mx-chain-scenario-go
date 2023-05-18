@@ -59,7 +59,7 @@ func (p *Parser) processLogList(logsRaw oj.OJsonObject) (mj.LogList, error) {
 						return mj.LogList{}, fmt.Errorf("invalid log entry topics: %w", err)
 					}
 				case "data":
-					logEntry.Data, err = p.parseCheckBytes(kvp.Value)
+					logEntry.Data, err = p.parseCheckValueList(kvp.Value)
 					if err != nil {
 						return mj.LogList{}, fmt.Errorf("invalid log data: %w", err)
 					}
