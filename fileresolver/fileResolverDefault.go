@@ -1,22 +1,11 @@
 package scenfileresolver
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 )
 
 var _ FileResolver = (*DefaultFileResolver)(nil)
-
-// DefaultMxscResolver loads file contents for the test parser.
-type DefaultMxscResolver struct {
-	code string
-}
-
-// // Implement json.Unmarshaller
-func (d *DefaultMxscResolver) Unmarshal(b []byte) error {
-	return json.Unmarshal(b, &d.code)
-}
 
 // DefaultFileResolver loads file contents for the test parser.
 type DefaultFileResolver struct {

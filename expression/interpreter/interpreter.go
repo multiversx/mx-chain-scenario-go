@@ -113,18 +113,7 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 			return []byte{}, err
 		}
 
-		mxsc := make(map[string]interface{})
-		err1 := json.Unmarshal([]byte(fileContents), &mxsc)
-		if err1 != nil {
-			return []byte{}, err1
-		}
-
-		mxscCode, err := hex.DecodeString(mxsc["code"].(string))
-		if err != nil {
-			return []byte{}, err1
-		}
-
-		return mxscCode, nil
+		return ei.interpretMxscJson(fileContents)
 	}
 
 	// file contents
@@ -405,4 +394,18 @@ func (ei *ExprInterpreter) interpretNestedBytes(strRaw string) (bool, []byte, er
 	lengthBytes := big.NewInt(int64(len(nestedBytes))).Bytes()
 	encodedLength := twos.CopyAlignRight(lengthBytes, 4)
 	return true, append(encodedLength, nestedBytes...), err
+}
+
+func (ei *ExprInterpreter) interpretMxscJson(fileContents []byte) ([]byte, error) {
+	mxsc := make(map[string]interface{})
+	err1 := json.Unmarshal([]byte(fileContents), &mxsc)
+	if err1 != nil {
+		return []byte{}, err1
+	}
+
+	mxscCode, err := hex.DecodeString(mxsc["code"].(string))
+	if err != nil {
+		return []byte{}, err1
+	}
+	return mxscCode, nil
 }
