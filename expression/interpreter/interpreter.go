@@ -2,6 +2,7 @@ package scenexpressioninterpreter
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -19,6 +20,7 @@ const addrPrefix = "address:"
 const scAddrPrefix = "sc:"
 
 const filePrefix = "file:"
+const mxscPrefix = "mxsc:"
 const keccak256Prefix = "keccak256:"
 
 const u64Prefix = "u64:"
@@ -98,6 +100,20 @@ func (ei *ExprInterpreter) InterpretSubTree(obj oj.OJsonObject) ([]byte, error) 
 func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 	if len(strRaw) == 0 {
 		return []byte{}, nil
+	}
+
+	// file contents
+	// TODO: make this part of a proper parser
+	if strings.HasPrefix(strRaw, mxscPrefix) {
+		if ei.FileResolver == nil {
+			return []byte{}, errors.New("parser MxscResolver not provided")
+		}
+		fileContents, err := ei.FileResolver.ResolveFileValue(strRaw[len(mxscPrefix):])
+		if err != nil {
+			return []byte{}, err
+		}
+
+		return ei.interpretMxscJson(fileContents)
 	}
 
 	// file contents
@@ -378,4 +394,18 @@ func (ei *ExprInterpreter) interpretNestedBytes(strRaw string) (bool, []byte, er
 	lengthBytes := big.NewInt(int64(len(nestedBytes))).Bytes()
 	encodedLength := twos.CopyAlignRight(lengthBytes, 4)
 	return true, append(encodedLength, nestedBytes...), err
+}
+
+func (ei *ExprInterpreter) interpretMxscJson(fileContents []byte) ([]byte, error) {
+	mxsc := make(map[string]interface{})
+	err1 := json.Unmarshal([]byte(fileContents), &mxsc)
+	if err1 != nil {
+		return []byte{}, err1
+	}
+
+	mxscCode, err := hex.DecodeString(mxsc["code"].(string))
+	if err != nil {
+		return []byte{}, err1
+	}
+	return mxscCode, nil
 }
