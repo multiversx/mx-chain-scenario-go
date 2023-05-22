@@ -31,28 +31,24 @@ const (
 
 	// CodeHint hints that value should be a smart contract code, normally loaded from a file
 	CodeHint
-
-	// Bech32Hint hints that value should be a bech32 address, normally loaded from a file
-	Bech32Hint
 )
 
 const maxBytesInterpretedAsNumber = 15
 
 // ExprReconstructor is a component that attempts to convert raw bytes to a human-readable format.
-type ExprReconstructor struct{}
+type ExprReconstructor struct {
+	Bech32Addr bool
+}
 
 // Reconstruct will return the string representation of the provided value
-func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHint, bech32Addr ...bool) string {
+func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHint) string {
 	switch hint {
 	case NumberHint:
 		return fmt.Sprintf("%d", big.NewInt(0).SetBytes(value))
 	case StrHint:
 		return fmt.Sprintf("str:%s", string(value))
 	case AddressHint:
-		if len(bech32Addr) > 0 {
-			return addressPretty(value, bech32Addr[0])
-		}
-		return addressPretty(value)
+		return addressPretty(value, er.Bech32Addr)
 	case CodeHint:
 		return codePretty(value)
 	default:
@@ -100,12 +96,12 @@ func unknownByteArrayPretty(bytes []byte) string {
 	return fmt.Sprintf("0x%s (str:%s)", hex.EncodeToString(bytes), strconv.Quote(string(bytes)))
 }
 
-func addressPretty(value []byte, bech32Addr ...bool) string {
+func addressPretty(value []byte, Bech32Addr bool) string {
 	if len(value) != 32 {
 		return unknownByteArrayPretty(value)
 	}
 
-	if len(bech32Addr) > 0 {
+	if Bech32Addr {
 		return bech32Pretty(value)
 	}
 

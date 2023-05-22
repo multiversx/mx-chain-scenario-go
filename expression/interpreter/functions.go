@@ -82,7 +82,7 @@ func (ei *ExprInterpreter) scExpression(input string) ([]byte, error) {
 	return address, err
 }
 
-func bech32Decoder(input string) ([]byte, error) {
+func bech32Decode(input string) ([]byte, error) {
 	addressLen := 32
 	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
 	str, err := bpc.Decode(input)

@@ -173,22 +173,26 @@ func TestAddressWithShardId(t *testing.T) {
 
 func TestBech32(t *testing.T) {
 	ei := interpreter()
-	er := reconstructor()
+	er := mer.ExprReconstructor{
+		Bech32Addr: true,
+	}
 
 	result, err := ei.InterpretString("bech32:erd109vw87y3tmmxps242wlg5vra8e2jvphq4m5y95fqxs4y7av7dqeqrjj9h4")
 	require.Nil(t, err)
 	require.Equal(t, []byte("\x79\x58\xe3\xf8\x91\x5e\xf6\x60\xc1\x55\x53\xbe\x8a\x30\x7d\x3e\x55\x26\x06\xe0\xae\xe8\x42\xd1\x20\x34\x2a\x4f\x75\x9e\x68\x32"), result)
-	require.Equal(t, "bech32:erd109vw87y3tmmxps242wlg5vra8e2jvphq4m5y95fqxs4y7av7dqeqrjj9h4", er.Reconstruct(result, mer.AddressHint, true))
+	require.Equal(t, "bech32:erd109vw87y3tmmxps242wlg5vra8e2jvphq4m5y95fqxs4y7av7dqeqrjj9h4", er.Reconstruct(result, mer.AddressHint))
 }
 
 func TestSCBech32(t *testing.T) {
 	ei := interpreter()
-	er := reconstructor()
+	er := mer.ExprReconstructor{
+		Bech32Addr: true,
+	}
 
 	result, err := ei.InterpretString("bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l")
 	require.Nil(t, err)
 	require.Equal(t, []byte("\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\xff\xff"), result)
-	require.Equal(t, "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l", er.Reconstruct(result, mer.AddressHint, true))
+	require.Equal(t, "bech32:erd1qqqqqqqqqqqqqqqpqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqplllst77y4l", er.Reconstruct(result, mer.AddressHint))
 }
 
 func TestSCAddress(t *testing.T) {
