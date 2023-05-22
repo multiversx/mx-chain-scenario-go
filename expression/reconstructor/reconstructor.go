@@ -96,12 +96,12 @@ func unknownByteArrayPretty(bytes []byte) string {
 	return fmt.Sprintf("0x%s (str:%s)", hex.EncodeToString(bytes), strconv.Quote(string(bytes)))
 }
 
-func addressPretty(value []byte, Bech32Addr bool) string {
+func addressPretty(value []byte, bech32Addr bool) string {
 	if len(value) != 32 {
 		return unknownByteArrayPretty(value)
 	}
 
-	if Bech32Addr {
+	if bech32Addr {
 		return bech32Pretty(value)
 	}
 
