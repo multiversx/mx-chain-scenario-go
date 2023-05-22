@@ -181,10 +181,11 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 		return addressExpression(addrArgument)
 	}
 
-	// address
+	// bech32 address
 	if strings.HasPrefix(strRaw, bech32Prefix) {
-		bech32Argument := strRaw[len(bech32Prefix):]
-		return addressExpression(bech32Argument)
+		addrArgument := strRaw[len(bech32Prefix):]
+
+		return bech32Decoder(addrArgument)
 	}
 
 	// smart contract address (different format)

@@ -171,6 +171,15 @@ func TestAddressWithShardId(t *testing.T) {
 	require.Equal(t, "address:1234567890123456789012345678901#66", er.Reconstruct(result, mer.AddressHint))
 }
 
+func TestBech32(t *testing.T) {
+	ei := interpreter()
+	er := reconstructor()
+
+	result, err := ei.InterpretString("bech32:erd109vw87y3tmmxps242wlg5vra8e2jvphq4m5y95fqxs4y7av7dqeqrjj9h4")
+	require.Nil(t, err)
+	require.Equal(t, "bech32:erd109vw87y3tmmxps242wlg5vra8e2jvphq4m5y95fqxs4y7av7dqeqrjj9h4", er.Reconstruct(result, mer.Bech32Hint))
+}
+
 func TestSCAddress(t *testing.T) {
 	ei := interpreter()
 	er := reconstructor()

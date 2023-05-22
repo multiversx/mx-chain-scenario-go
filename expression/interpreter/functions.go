@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"strings"
 
+	pc "github.com/multiversx/mx-chain-scenario-go/pubkeyConverter"
+
 	"github.com/multiversx/mx-chain-core-go/core"
+	"github.com/multiversx/mx-chain-core-go/core/mock"
 	"golang.org/x/crypto/sha3"
 )
 
@@ -77,4 +80,28 @@ func (ei *ExprInterpreter) scExpression(input string) ([]byte, error) {
 	address, err := createAddressOptionalShardId(input, SCAddressReservedPrefixLength)
 	copy(address[SCAddressReservedPrefixLength-core.VMTypeLen:], ei.GetVMType()[:])
 	return address, err
+}
+
+func bech32Decoder(input string) ([]byte, error) {
+	addressLen := 32
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
+	str, err := bpc.Decode(input)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return str, err
+	// bech32 := bech32PubkeyConverter{
+	// 	log: log,
+	// 	len: addressLen,
+	// }
+	// decodedPrefix, buff, err := bech32.Decode(humanReadable)
+
+	// // warning: mind the order of the parameters, those should be inverted
+	// decodedBytes, err := bech32.ConvertBits(buff, bech32Config.toBits, bech32Config.fromBits, !bech32Config.pad)
+	// if err != nil {
+	// 	return nil, ErrBech32ConvertError
+	// }
+
 }

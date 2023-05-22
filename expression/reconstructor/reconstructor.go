@@ -8,7 +8,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/multiversx/mx-chain-core-go/core/mock"
 	ei "github.com/multiversx/mx-chain-scenario-go/expression/interpreter"
+	pc "github.com/multiversx/mx-chain-scenario-go/pubkeyConverter"
 )
 
 // ExprReconstructorHint type definition
@@ -29,6 +31,9 @@ const (
 
 	// CodeHint hints that value should be a smart contract code, normally loaded from a file
 	CodeHint
+
+	// Bech32Hint hints that value should be a bech32 address, normally loaded from a file
+	Bech32Hint
 )
 
 const maxBytesInterpretedAsNumber = 15
@@ -47,6 +52,8 @@ func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHin
 		return addressPretty(value)
 	case CodeHint:
 		return codePretty(value)
+	case Bech32Hint:
+		return bech32Pretty(value)
 	default:
 		return unknownByteArrayPretty(value)
 	}
@@ -154,4 +161,19 @@ func codePretty(bytes []byte) string {
 	}
 
 	return fmt.Sprintf("0x%s", encoded)
+}
+
+func bech32Pretty(bytes []byte) string {
+	if len(bytes) == 0 {
+		return ""
+	}
+	addressLen := 32
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
+	encoded := bpc.Encode(bytes)
+
+	if len(encoded) > 20 {
+		return fmt.Sprintf("bech32:%s", encoded[:62])
+	}
+
+	return fmt.Sprintf("bech32:%s", encoded)
 }
