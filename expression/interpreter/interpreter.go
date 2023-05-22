@@ -184,7 +184,6 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 	// bech32 address
 	if strings.HasPrefix(strRaw, bech32Prefix) {
 		addrArgument := strRaw[len(bech32Prefix):]
-
 		return bech32Decoder(addrArgument)
 	}
 

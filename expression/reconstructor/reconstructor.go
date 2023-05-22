@@ -9,8 +9,8 @@ import (
 	"strings"
 
 	"github.com/multiversx/mx-chain-core-go/core/mock"
+	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	ei "github.com/multiversx/mx-chain-scenario-go/expression/interpreter"
-	pc "github.com/multiversx/mx-chain-scenario-go/pubkeyConverter"
 )
 
 // ExprReconstructorHint type definition
@@ -42,18 +42,19 @@ const maxBytesInterpretedAsNumber = 15
 type ExprReconstructor struct{}
 
 // Reconstruct will return the string representation of the provided value
-func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHint) string {
+func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHint, bech32Addr ...bool) string {
 	switch hint {
 	case NumberHint:
 		return fmt.Sprintf("%d", big.NewInt(0).SetBytes(value))
 	case StrHint:
 		return fmt.Sprintf("str:%s", string(value))
 	case AddressHint:
+		if len(bech32Addr) > 0 {
+			return addressPretty(value, bech32Addr[0])
+		}
 		return addressPretty(value)
 	case CodeHint:
 		return codePretty(value)
-	case Bech32Hint:
-		return bech32Pretty(value)
 	default:
 		return unknownByteArrayPretty(value)
 	}
@@ -99,9 +100,13 @@ func unknownByteArrayPretty(bytes []byte) string {
 	return fmt.Sprintf("0x%s (str:%s)", hex.EncodeToString(bytes), strconv.Quote(string(bytes)))
 }
 
-func addressPretty(value []byte) string {
+func addressPretty(value []byte, bech32Addr ...bool) string {
 	if len(value) != 32 {
 		return unknownByteArrayPretty(value)
+	}
+
+	if len(bech32Addr) > 0 {
+		return bech32Pretty(value)
 	}
 
 	// smart contract addresses

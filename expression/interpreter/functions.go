@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	pc "github.com/multiversx/mx-chain-scenario-go/pubkeyConverter"
-
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/mock"
 	"golang.org/x/crypto/sha3"
+
+	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 )
 
 // SCAddressNumLeadingZeros is the number of zero bytes every smart contract address begins with.
@@ -92,16 +92,4 @@ func bech32Decoder(input string) ([]byte, error) {
 	}
 
 	return str, err
-	// bech32 := bech32PubkeyConverter{
-	// 	log: log,
-	// 	len: addressLen,
-	// }
-	// decodedPrefix, buff, err := bech32.Decode(humanReadable)
-
-	// // warning: mind the order of the parameters, those should be inverted
-	// decodedBytes, err := bech32.ConvertBits(buff, bech32Config.toBits, bech32Config.fromBits, !bech32Config.pad)
-	// if err != nil {
-	// 	return nil, ErrBech32ConvertError
-	// }
-
 }
