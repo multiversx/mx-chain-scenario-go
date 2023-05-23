@@ -6,7 +6,10 @@ import (
 	"strings"
 
 	"github.com/multiversx/mx-chain-core-go/core"
+	"github.com/multiversx/mx-chain-core-go/core/mock"
 	"golang.org/x/crypto/sha3"
+
+	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 )
 
 // SCAddressNumLeadingZeros is the number of zero bytes every smart contract address begins with.
@@ -77,4 +80,16 @@ func (ei *ExprInterpreter) scExpression(input string) ([]byte, error) {
 	address, err := createAddressOptionalShardId(input, SCAddressReservedPrefixLength)
 	copy(address[SCAddressReservedPrefixLength-core.VMTypeLen:], ei.GetVMType()[:])
 	return address, err
+}
+
+func bech32Decode(input string) ([]byte, error) {
+	addressLen := 32
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
+	str, err := bpc.Decode(input)
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	return str, err
 }

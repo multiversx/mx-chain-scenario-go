@@ -18,6 +18,7 @@ var strPrefixes = []string{"str:", "``", "''"}
 
 const addrPrefix = "address:"
 const scAddrPrefix = "sc:"
+const bech32Prefix = "bech32:"
 
 const filePrefix = "file:"
 const mxscPrefix = "mxsc:"
@@ -178,6 +179,12 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 	if strings.HasPrefix(strRaw, addrPrefix) {
 		addrArgument := strRaw[len(addrPrefix):]
 		return addressExpression(addrArgument)
+	}
+
+	// bech32 address
+	if strings.HasPrefix(strRaw, bech32Prefix) {
+		addrArgument := strRaw[len(bech32Prefix):]
+		return bech32Decode(addrArgument)
 	}
 
 	// smart contract address (different format)

@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/multiversx/mx-chain-core-go/core/mock"
+	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	ei "github.com/multiversx/mx-chain-scenario-go/expression/interpreter"
 )
 
@@ -34,7 +36,9 @@ const (
 const maxBytesInterpretedAsNumber = 15
 
 // ExprReconstructor is a component that attempts to convert raw bytes to a human-readable format.
-type ExprReconstructor struct{}
+type ExprReconstructor struct {
+	Bech32Addr bool
+}
 
 // Reconstruct will return the string representation of the provided value
 func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHint) string {
@@ -44,7 +48,7 @@ func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHin
 	case StrHint:
 		return fmt.Sprintf("str:%s", string(value))
 	case AddressHint:
-		return addressPretty(value)
+		return addressPretty(value, er.Bech32Addr)
 	case CodeHint:
 		return codePretty(value)
 	default:
@@ -92,9 +96,13 @@ func unknownByteArrayPretty(bytes []byte) string {
 	return fmt.Sprintf("0x%s (str:%s)", hex.EncodeToString(bytes), strconv.Quote(string(bytes)))
 }
 
-func addressPretty(value []byte) string {
+func addressPretty(value []byte, bech32Addr bool) string {
 	if len(value) != 32 {
 		return unknownByteArrayPretty(value)
+	}
+
+	if bech32Addr {
+		return bech32Pretty(value)
 	}
 
 	// smart contract addresses
@@ -154,4 +162,19 @@ func codePretty(bytes []byte) string {
 	}
 
 	return fmt.Sprintf("0x%s", encoded)
+}
+
+func bech32Pretty(bytes []byte) string {
+	if len(bytes) == 0 {
+		return ""
+	}
+	addressLen := 32
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
+	encoded := bpc.Encode(bytes)
+
+	if len(encoded) > 20 {
+		return fmt.Sprintf("bech32:%s", encoded[:62])
+	}
+
+	return fmt.Sprintf("bech32:%s", encoded)
 }
