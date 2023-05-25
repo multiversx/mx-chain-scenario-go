@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/TwiN/go-color v1.1.0
 	github.com/multiversx/mx-chain-core-go v1.2.1
-	github.com/multiversx/mx-chain-vm-common-go v1.3.33-0.20230123162357-c6f6931a3dec
+	github.com/multiversx/mx-chain-vm-common-go v1.3.38
 	github.com/multiversx/mx-components-big-int v0.1.1
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.3.0
