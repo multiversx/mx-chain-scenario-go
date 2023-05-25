@@ -64,17 +64,18 @@ func (tt TransactionType) HasGasPrice() bool {
 
 // Transaction is a json object representing a transaction.
 type Transaction struct {
-	Type      TransactionType
-	Nonce     JSONUint64
-	EGLDValue JSONBigInt
-	ESDTValue []*ESDTTxData
-	From      JSONBytesFromString
-	To        JSONBytesFromString
-	Function  string
-	Code      JSONBytesFromString
-	Arguments []JSONBytesFromTree
-	GasPrice  JSONUint64
-	GasLimit  JSONUint64
+	Type         TransactionType
+	Nonce        JSONUint64
+	EGLDValue    JSONBigInt
+	ESDTValue    []*ESDTTxData
+	From         JSONBytesFromString
+	To           JSONBytesFromString
+	Function     string
+	Code         JSONBytesFromString
+	CodeMetadata JSONBytesFromString
+	Arguments    []JSONBytesFromTree
+	GasPrice     JSONUint64
+	GasLimit     JSONUint64
 }
 
 // TransactionResult is a json object representing an expected transaction result.
