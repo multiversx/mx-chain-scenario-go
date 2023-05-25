@@ -41,6 +41,9 @@ func AccountsToOJ(accounts []*mj.Account) oj.OJsonObject {
 		if len(account.Code.Original) > 0 {
 			acctOJ.Put("code", bytesFromStringToOJ(account.Code))
 		}
+		if len(account.CodeMetadata.Original) > 0 {
+			acctOJ.Put("codeMetadata", bytesFromStringToOJ(account.CodeMetadata))
+		}
 		if len(account.Owner.Value) > 0 {
 			acctOJ.Put("owner", bytesFromStringToOJ(account.Owner))
 		}
@@ -97,6 +100,9 @@ func checkAccountsToOJ(checkAccounts *mj.CheckAccounts) oj.OJsonObject {
 		}
 		if !checkAccount.Code.IsUnspecified() {
 			acctOJ.Put("code", checkBytesToOJ(checkAccount.Code))
+		}
+		if !checkAccount.CodeMetadata.IsUnspecified() {
+			acctOJ.Put("codeMetadata", checkBytesToOJ(checkAccount.CodeMetadata))
 		}
 		if !checkAccount.Owner.IsUnspecified() {
 			acctOJ.Put("owner", checkBytesToOJ(checkAccount.Owner))

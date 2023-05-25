@@ -34,6 +34,7 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 		Username:        mj.JSONBytesEmpty(),
 		Storage:         nil,
 		Code:            mj.JSONBytesEmpty(),
+		CodeMetadata:    mj.JSONBytesEmpty(),
 		Owner:           mj.JSONBytesEmpty(),
 		AsyncCallData:   "",
 		ESDTData:        nil,
@@ -116,6 +117,11 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 			acct.Code, err = p.processStringAsByteArray(kvp.Value)
 			if err != nil {
 				return nil, fmt.Errorf("invalid account code: %w", err)
+			}
+		case "codeMetadata":
+			acct.CodeMetadata, err = p.processStringAsByteArray(kvp.Value)
+			if err != nil {
+				return nil, fmt.Errorf("invalid account codeMetadata: %w", err)
 			}
 		case "owner":
 			acct.Owner, err = p.processStringAsByteArray(kvp.Value)
