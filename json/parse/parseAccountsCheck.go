@@ -24,6 +24,7 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 		MoreStorageAllowed:    false,
 		CheckStorage:          nil,
 		Code:                  mj.JSONCheckBytesUnspecified(),
+		CodeMetadata:          mj.JSONCheckBytesUnspecified(),
 		Owner:                 mj.JSONCheckBytesUnspecified(),
 		AsyncCallData:         mj.JSONCheckBytesUnspecified(),
 		IgnoreESDT:            false,
@@ -111,6 +112,11 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 			acct.Code, err = p.parseCheckBytes(kvp.Value)
 			if err != nil {
 				return nil, fmt.Errorf("invalid account code: %w", err)
+			}
+		case "codeMetadata":
+			acct.CodeMetadata, err = p.parseCheckBytes(kvp.Value)
+			if err != nil {
+				return nil, fmt.Errorf("invalid account codeMetadata: %w", err)
 			}
 		case "owner":
 			acct.Owner, err = p.parseCheckBytes(kvp.Value)

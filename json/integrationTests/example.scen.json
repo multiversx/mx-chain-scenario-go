@@ -157,6 +157,7 @@
                         }
                     },
                     "code": "file:smart-contract.wasm",
+                    "codeMetadata": "0x0101",
                     "owner": "address:alice",
                     "developerRewards": "100"
                 }
@@ -468,6 +469,7 @@
                         "+": ""
                     },
                     "code": "file:smart-contract.wasm",
+                    "codeMetadata": "0x0101",
                     "owner": "address:bob"
                 },
                 "address:smart_contract_address_2": {
@@ -476,6 +478,7 @@
                     "username": "*",
                     "storage": "*",
                     "code": "*",
+                    "codeMetadata": "*",
                     "owner": "*",
                     "asyncCallData": "``func@arg1@arg2"
                 },

@@ -13,6 +13,7 @@ type Account struct {
 	Username        JSONBytesFromString
 	Storage         []*StorageKeyValuePair
 	Code            JSONBytesFromString
+	CodeMetadata    JSONBytesFromString
 	Owner           JSONBytesFromString
 	AsyncCallData   string
 	ESDTData        []*ESDTData
@@ -38,6 +39,7 @@ type CheckAccount struct {
 	MoreStorageAllowed    bool
 	CheckStorage          []*CheckStorageKeyValuePair
 	Code                  JSONCheckBytes
+	CodeMetadata          JSONCheckBytes
 	Owner                 JSONCheckBytes
 	AsyncCallData         JSONCheckBytes
 	CheckESDTData         []*CheckESDTData
