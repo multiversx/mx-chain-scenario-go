@@ -194,7 +194,7 @@ func CreateDeployTransaction(
 		WithGasLimitAndPrice(gasLimit, gasPrice)
 }
 
-// CreateDeployTransaction creates a deploy transaction
+// CreateUpgradeTransaction creates a deploy transaction
 func CreateUpgradeTransaction(
 	args [][]byte,
 	scCodePath string,
