@@ -7,9 +7,6 @@ const (
 	// ScDeploy describes a transaction that deploys a new contract
 	ScDeploy TransactionType = iota
 
-	// ScUpgrade describes a regular smart contract call
-	ScUpgrade
-
 	// ScCall describes a regular smart contract call
 	ScCall
 
@@ -23,6 +20,9 @@ const (
 	// ValidatorReward is when the protocol sends a validator reward to the target account.
 	// It increases the balance, but also increments the reward value in storage.
 	ValidatorReward
+
+	// ScUpgrade describes a regular smart contract call
+	ScUpgrade
 )
 
 // HasSender is a helper function to indicate if transaction has `from` field.

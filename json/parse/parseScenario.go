@@ -290,13 +290,11 @@ func (p *Parser) parseTxStep(txType mj.TransactionType, stepMap *oj.OJsonMap) (*
 				return nil, fmt.Errorf("bad tx step comment: %w", err)
 			}
 		case "tx":
-			print("Transaction")
 			step.Tx, err = p.processTx(txType, kvp.Value)
 			if err != nil {
 				return nil, fmt.Errorf("cannot parse tx step transaction: %w", err)
 			}
 		case "expect":
-			print("Expect")
 			if !step.Tx.Type.IsSmartContractTx() {
 				return nil, fmt.Errorf("no expected result allowed for step of type %s", step.StepTypeName())
 			}

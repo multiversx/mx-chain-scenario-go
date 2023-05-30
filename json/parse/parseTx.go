@@ -19,9 +19,6 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 		EGLDValue: mj.JSONBigIntZero(),
 		ESDTValue: nil,
 	}
-	if txType == mj.ScUpgrade {
-		print("!!!!transaction type", txType)
-	}
 
 	var err error
 	for _, kvp := range bltMap.OrderedKV {
