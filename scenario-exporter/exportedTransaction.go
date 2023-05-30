@@ -198,7 +198,6 @@ func CreateDeployTransaction(
 func CreateUpgradeTransaction(
 	args [][]byte,
 	scCodePath string,
-	nonce uint64,
 	sndAddr []byte,
 	rcvAddr []byte,
 	gasLimit uint64,
@@ -206,7 +205,6 @@ func CreateUpgradeTransaction(
 ) *Transaction {
 	return NewTransaction().
 		WithDeployData(scCodePath, args).
-		WithNonce(nonce).
 		WithSenderAddress(sndAddr).
 		WithReceiverAddress(rcvAddr).
 		WithGasLimitAndPrice(gasLimit, gasPrice)

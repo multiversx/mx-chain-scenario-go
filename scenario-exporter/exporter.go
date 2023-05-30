@@ -125,9 +125,8 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 					}
 					tx := CreateUpgradeTransaction(
 						arguments,
-						step.Tx.Nonce.Value,
+						step.Tx.Code.Original,
 						step.Tx.From.Value,
-						// step.Tx.To.Value,
 						append(ScAddressPrefix, step.Tx.To.Value[ScAddressPrefixLength:]...),
 						step.Tx.GasLimit.Value,
 						step.Tx.GasPrice.Value,
