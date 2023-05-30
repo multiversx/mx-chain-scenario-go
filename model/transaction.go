@@ -7,6 +7,9 @@ const (
 	// ScDeploy describes a transaction that deploys a new contract
 	ScDeploy TransactionType = iota
 
+	// ScUpgrade describes a regular smart contract call
+	ScUpgrade
+
 	// ScCall describes a regular smart contract call
 	ScCall
 
@@ -34,7 +37,7 @@ func (tt TransactionType) HasReceiver() bool {
 
 // IsSmartContractTx indicates whether tx type allows an `expect` field.
 func (tt TransactionType) IsSmartContractTx() bool {
-	return tt == ScDeploy || tt == ScCall || tt == ScQuery
+	return tt == ScDeploy || tt == ScUpgrade || tt == ScCall || tt == ScQuery
 }
 
 // HasValue indicates whether tx type allows a `value` field.
@@ -54,12 +57,12 @@ func (tt TransactionType) HasFunction() bool {
 
 // HasGasLimit is a helper function to indicate if transaction has `gasLimit` field.
 func (tt TransactionType) HasGasLimit() bool {
-	return tt == ScDeploy || tt == ScCall || tt == Transfer
+	return tt == ScDeploy || tt == ScUpgrade || tt == ScCall || tt == Transfer
 }
 
 // HasGasPrice is a helper function to indicate if transaction has `gasPrice` field.
 func (tt TransactionType) HasGasPrice() bool {
-	return tt == ScDeploy || tt == ScCall || tt == Transfer
+	return tt == ScDeploy || tt == ScUpgrade || tt == ScCall || tt == Transfer
 }
 
 // Transaction is a json object representing a transaction.

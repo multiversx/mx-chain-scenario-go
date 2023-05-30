@@ -119,6 +119,20 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 						step.Tx.GasPrice.Value,
 					)
 					stateAndBenchmarkInfo.Txs = append(stateAndBenchmarkInfo.Txs, tx)
+				case "scUpgrade":
+					if txIdRequiresBenchmark(step.TxIdent) && benchmarkTxPosIsNotSet(stateAndBenchmarkInfo.BenchmarkTxPos) {
+						stateAndBenchmarkInfo.BenchmarkTxPos = len(stateAndBenchmarkInfo.Txs)
+					}
+					tx := CreateUpgradeTransaction(
+						arguments,
+						step.Tx.Nonce.Value,
+						step.Tx.From.Value,
+						// step.Tx.To.Value,
+						append(ScAddressPrefix, step.Tx.To.Value[ScAddressPrefixLength:]...),
+						step.Tx.GasLimit.Value,
+						step.Tx.GasPrice.Value,
+					)
+					stateAndBenchmarkInfo.Txs = append(stateAndBenchmarkInfo.Txs, tx)
 				case "scDeploy":
 					deployTx := CreateDeployTransaction(
 						arguments,
