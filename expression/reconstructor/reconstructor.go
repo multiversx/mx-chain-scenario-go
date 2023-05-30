@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/multiversx/mx-chain-core-go/core/mock"
+	"github.com/multiversx/mx-chain-core-go/core"
 	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
 	ei "github.com/multiversx/mx-chain-scenario-go/expression/interpreter"
 )
@@ -164,13 +164,17 @@ func codePretty(bytes []byte) string {
 	return fmt.Sprintf("0x%s", encoded)
 }
 
-func bech32Pretty(bytes []byte) string {
-	if len(bytes) == 0 {
+func bech32Pretty(pkBytes []byte) string {
+	if len(pkBytes) == 0 {
 		return ""
 	}
 	addressLen := 32
-	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
-	encoded := bpc.Encode(bytes)
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, core.DefaultAddressPrefix)
+	encoded, err := bpc.Encode(pkBytes)
+
+	if err != nil {
+		return ""
+	}
 
 	if len(encoded) > 20 {
 		return fmt.Sprintf("bech32:%s", encoded[:62])

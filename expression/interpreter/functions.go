@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/multiversx/mx-chain-core-go/core"
-	"github.com/multiversx/mx-chain-core-go/core/mock"
 	"golang.org/x/crypto/sha3"
 
 	pc "github.com/multiversx/mx-chain-core-go/core/pubkeyConverter"
@@ -84,7 +83,7 @@ func (ei *ExprInterpreter) scExpression(input string) ([]byte, error) {
 
 func bech32Decode(input string) ([]byte, error) {
 	addressLen := 32
-	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, &mock.LoggerMock{})
+	bpc, _ := pc.NewBech32PubkeyConverter(addressLen, core.DefaultAddressPrefix)
 	str, err := bpc.Decode(input)
 
 	if err != nil {
