@@ -21,7 +21,7 @@ const (
 	// It increases the balance, but also increments the reward value in storage.
 	ValidatorReward
 
-	// ScUpgrade describes a regular smart contract call
+	// ScUpgrade describes a transaction that upgrades an existing contract
 	ScUpgrade
 )
 
