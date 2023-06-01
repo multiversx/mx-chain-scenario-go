@@ -193,3 +193,19 @@ func CreateDeployTransaction(
 		WithSenderAddress(sndAddr).
 		WithGasLimitAndPrice(gasLimit, gasPrice)
 }
+
+// CreateUpgradeTransaction creates a deploy transaction
+func CreateUpgradeTransaction(
+	args [][]byte,
+	scCodePath string,
+	sndAddr []byte,
+	rcvAddr []byte,
+	gasLimit uint64,
+	gasPrice uint64,
+) *Transaction {
+	return NewTransaction().
+		WithDeployData(scCodePath, args).
+		WithSenderAddress(sndAddr).
+		WithReceiverAddress(rcvAddr).
+		WithGasLimitAndPrice(gasLimit, gasPrice)
+}

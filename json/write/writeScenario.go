@@ -125,7 +125,7 @@ func transactionToScenarioOJ(tx *mj.Transaction) oj.OJsonObject {
 	if tx.Type.HasFunction() {
 		transactionOJ.Put("function", stringToOJ(tx.Function))
 	}
-	if tx.Type == mj.ScDeploy {
+	if tx.Type == mj.ScDeploy || tx.Type == mj.ScUpgrade {
 		transactionOJ.Put("contractCode", bytesFromStringToOJ(tx.Code))
 	}
 

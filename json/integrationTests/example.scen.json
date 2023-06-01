@@ -517,6 +517,18 @@
                 "gasLimit": "0x100000000",
                 "gasPrice": "0x01"
             }
+        },
+        {
+            "step": "scUpgrade",
+            "id": "upgrade",
+            "comment": "another",
+            "tx": {
+                "from": "address:C",
+                "to": "address:D",
+                "contractCode": "mxsc:example.mxsc.json",
+                "gasLimit": "0x100000",
+                "gasPrice": "0x01"
+            }
         }
     ]
 }

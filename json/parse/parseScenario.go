@@ -253,6 +253,8 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 		return p.parseTxStep(mj.ScCall, stepMap)
 	case mj.StepNameScDeploy:
 		return p.parseTxStep(mj.ScDeploy, stepMap)
+	case mj.StepNameScUpgrade:
+		return p.parseTxStep(mj.ScUpgrade, stepMap)
 	case mj.StepNameScQuery:
 		return p.parseTxStep(mj.ScQuery, stepMap)
 	case mj.StepNameTransfer:

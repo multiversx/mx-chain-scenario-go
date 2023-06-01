@@ -101,16 +101,16 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 			if err != nil {
 				return nil, fmt.Errorf("invalid transaction contract code: %w", err)
 			}
-			if txType != mj.ScDeploy && len(blt.Code.Value) > 0 {
-				return nil, errors.New("transaction contractCode field only allowed in scDeploy transactions")
+			if txType != mj.ScDeploy && txType != mj.ScUpgrade && len(blt.Code.Value) > 0 {
+				return nil, errors.New("transaction contractCode field only allowed in scDeploy or scUpgrade transactions")
 			}
 		case "codeMetadata":
 			blt.CodeMetadata, err = p.processStringAsByteArray(kvp.Value)
 			if err != nil {
 				return nil, fmt.Errorf("invalid transaction contract codeMetadata: %w", err)
 			}
-			if txType != mj.ScDeploy && len(blt.CodeMetadata.Value) > 0 {
-				return nil, errors.New("transaction codeMetadata field only allowed in scDeploy transactions")
+			if txType != mj.ScDeploy && txType != mj.ScUpgrade && len(blt.CodeMetadata.Value) > 0 {
+				return nil, errors.New("transaction codeMetadata field only allowed in scDeploy or scUpgrade transactions")
 			}
 		case "gasLimit":
 			if !txType.HasGasLimit() {
