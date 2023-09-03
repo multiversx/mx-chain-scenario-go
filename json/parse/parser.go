@@ -12,6 +12,7 @@ type Parser struct {
 	AllowEsdtLegacySetSyntax         bool
 	AllowEsdtLegacyCheckSyntax       bool
 	AllowSingleValueInCheckValueList bool
+	IgnoreCode                       bool
 }
 
 // NewParser provides a new Parser instance.

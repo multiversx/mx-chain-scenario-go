@@ -114,7 +114,12 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 				acct.Storage = append(acct.Storage, &stElem)
 			}
 		case "code":
-			acct.Code, err = p.processStringAsByteArray(kvp.Value)
+			if p.IgnoreCode {
+				acct.Code, err = p.ignoreString(kvp.Value)
+			} else {
+				acct.Code, err = p.processStringAsByteArray(kvp.Value)
+			}
+
 			if err != nil {
 				return nil, fmt.Errorf("invalid account code: %w", err)
 			}

@@ -109,7 +109,11 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 				}
 			}
 		case "code":
-			acct.Code, err = p.parseCheckBytes(kvp.Value)
+			if p.IgnoreCode {
+				acct.Code, err = p.ignoreCheckBytes(kvp.Value)
+			} else {
+				acct.Code, err = p.parseCheckBytes(kvp.Value)
+			}
 			if err != nil {
 				return nil, fmt.Errorf("invalid account code: %w", err)
 			}

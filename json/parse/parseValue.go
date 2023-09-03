@@ -157,3 +157,24 @@ func IsStar(obj oj.OJsonObject) bool {
 	}
 	return str.Value == "*"
 }
+
+func (p *Parser) ignoreString(obj oj.OJsonObject) (mj.JSONBytesFromString, error) {
+	strVal, err := p.parseString(obj)
+	if err != nil {
+		return mj.JSONBytesFromString{}, err
+	}
+	return mj.NewJSONBytesFromString([]byte{}, strVal), nil
+}
+
+func (p *Parser) ignoreCheckBytes(obj oj.OJsonObject) (mj.JSONCheckBytes, error) {
+	if IsStar(obj) {
+		// "*" means any value, skip checking it
+		return mj.JSONCheckBytesStar(), nil
+	}
+
+	return mj.JSONCheckBytes{
+		Value:    []byte{},
+		IsStar:   false,
+		Original: obj,
+	}, nil
+}
