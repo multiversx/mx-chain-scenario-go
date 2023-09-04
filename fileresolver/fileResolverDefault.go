@@ -37,6 +37,13 @@ func (fr *DefaultFileResolver) AllowMissingFiles() *DefaultFileResolver {
 	return fr
 }
 
+// WithContext sets directory where the test runs, to help resolve relative paths.
+// Unlike SetContext, can be chained in a builder pattern.
+func (fr *DefaultFileResolver) WithContext(contextPath string) *DefaultFileResolver {
+	fr.contextPath = contextPath
+	return fr
+}
+
 // Clone creates new instance of the same type.
 func (fr *DefaultFileResolver) Clone() FileResolver {
 	return &DefaultFileResolver{
