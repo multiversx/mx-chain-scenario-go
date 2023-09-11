@@ -1,7 +1,8 @@
 package scenfileresolver
 
 import (
-	"io/ioutil"
+	"fmt"
+	"os"
 	"path/filepath"
 )
 
@@ -11,6 +12,7 @@ var _ FileResolver = (*DefaultFileResolver)(nil)
 type DefaultFileResolver struct {
 	contextPath              string
 	contractPathReplacements map[string]string
+	allowMissingFiles        bool
 }
 
 // NewDefaultFileResolver yields a new DefaultFileResolver instance.
@@ -18,6 +20,7 @@ func NewDefaultFileResolver() *DefaultFileResolver {
 	return &DefaultFileResolver{
 		contextPath:              "",
 		contractPathReplacements: make(map[string]string),
+		allowMissingFiles:        false,
 	}
 }
 
@@ -25,6 +28,19 @@ func NewDefaultFileResolver() *DefaultFileResolver {
 // It is very useful when testing multiple contracts against the same tests.
 func (fr *DefaultFileResolver) ReplacePath(pathInTest, actualPath string) *DefaultFileResolver {
 	fr.contractPathReplacements[pathInTest] = actualPath
+	return fr
+}
+
+// AllowMissingFiles configures the resolver to not crash when encountering missing files.
+func (fr *DefaultFileResolver) AllowMissingFiles() *DefaultFileResolver {
+	fr.allowMissingFiles = true
+	return fr
+}
+
+// WithContext sets directory where the test runs, to help resolve relative paths.
+// Unlike SetContext, can be chained in a builder pattern.
+func (fr *DefaultFileResolver) WithContext(contextPath string) *DefaultFileResolver {
+	fr.contextPath = contextPath
 	return fr
 }
 
@@ -59,8 +75,11 @@ func (fr *DefaultFileResolver) ResolveFileValue(value string) ([]byte, error) {
 		return []byte{}, nil
 	}
 	fullPath := fr.ResolveAbsolutePath(value)
-	scCode, err := ioutil.ReadFile(fullPath)
+	scCode, err := os.ReadFile(fullPath)
 	if err != nil {
+		if fr.allowMissingFiles {
+			return []byte(fmt.Sprintf("MISSING:%s", value)), nil
+		}
 		return []byte{}, err
 	}
 
