@@ -1,7 +1,7 @@
 package scenjsontest
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -26,7 +26,7 @@ func loadExampleFile(path string) ([]byte, error) {
 		_ = jsonFile.Close()
 	}()
 
-	return ioutil.ReadAll(jsonFile)
+	return io.ReadAll(jsonFile)
 }
 
 func TestWriteTest(t *testing.T) {
@@ -44,7 +44,7 @@ func TestWriteTest(t *testing.T) {
 	serialized := mjwrite.TestToJSONString(testTopLevel)
 
 	// good for debugging:
-	_ = ioutil.WriteFile("serialized.test.json", []byte(serialized), 0644)
+	_ = os.WriteFile("serialized.test.json", []byte(serialized), 0644)
 
 	require.Equal(t, contents, []byte(serialized))
 }

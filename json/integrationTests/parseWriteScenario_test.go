@@ -1,7 +1,7 @@
 package scenjsontest
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	fr "github.com/multiversx/mx-chain-scenario-go/fileresolver"
@@ -25,7 +25,7 @@ func TestWriteScenario(t *testing.T) {
 	serialized := mjwrite.ScenarioToJSONString(scenario)
 
 	// good for debugging:
-	_ = ioutil.WriteFile("serialized.scen.json", []byte(serialized), 0644)
+	_ = os.WriteFile("serialized.scen.json", []byte(serialized), 0644)
 
 	require.Equal(t, contents, []byte(serialized))
 }
