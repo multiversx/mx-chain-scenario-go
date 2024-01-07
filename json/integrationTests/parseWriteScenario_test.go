@@ -1,6 +1,7 @@
 package scenjsontest
 
 import (
+	"io"
 	"os"
 	"testing"
 
@@ -9,6 +10,24 @@ import (
 	mjwrite "github.com/multiversx/mx-chain-scenario-go/json/write"
 	"github.com/stretchr/testify/require"
 )
+
+func loadExampleFile(path string) ([]byte, error) {
+	// Open our jsonFile
+	var jsonFile *os.File
+	var err error
+	jsonFile, err = os.Open(path)
+	// if we os.Open returns an error then handle it
+	if err != nil {
+		return nil, err
+	}
+
+	// defer the closing of our jsonFile so that we can parse it later on
+	defer func() {
+		_ = jsonFile.Close()
+	}()
+
+	return io.ReadAll(jsonFile)
+}
 
 func TestWriteScenario(t *testing.T) {
 	contents, err := loadExampleFile("example.scen.json")

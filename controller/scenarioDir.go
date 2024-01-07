@@ -54,3 +54,24 @@ func (r *ScenarioController) RunAllJSONScenariosInDirectory(
 
 	return nil
 }
+
+func isExcluded(excludedFilePatterns []string, testPath string, generalTestPath string) bool {
+	for _, et := range excludedFilePatterns {
+		excludedFullPath := path.Join(generalTestPath, et)
+		match, err := filepath.Match(excludedFullPath, testPath)
+		if err != nil {
+			panic(err)
+		}
+		if match {
+			return true
+		}
+	}
+	return false
+}
+
+func shortenTestPath(path string, generalTestPath string) string {
+	if strings.HasPrefix(path, generalTestPath+"/") {
+		return path[len(generalTestPath)+1:]
+	}
+	return path
+}
