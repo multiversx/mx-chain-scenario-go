@@ -11,7 +11,7 @@ import (
 )
 
 // RunScenariosAtPath runs either;
-// - all scenarios in forlder if path is a directory
+// - all scenarios in folder if path is a directory
 // - single scenario given as path.
 func RunScenariosAtPath(path string, options CLIRunOptions) error {
 	fi, err := os.Stat(path)
