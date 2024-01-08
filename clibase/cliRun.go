@@ -1,4 +1,4 @@
-package scencli
+package scenclibase
 
 import (
 	"errors"
@@ -10,7 +10,10 @@ import (
 	scenexec "github.com/multiversx/mx-chain-scenario-go/executor"
 )
 
-func run(path string, options CLIRunOptions) error {
+// RunScenariosAtPath runs either;
+// - all scenarios in forlder if path is a directory
+// - single scenario given as path.
+func RunScenariosAtPath(path string, options CLIRunOptions) error {
 	fi, err := os.Stat(path)
 	if err != nil {
 		return err

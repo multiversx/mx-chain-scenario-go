@@ -1,4 +1,4 @@
-package scencli
+package scenclibase
 
 import (
 	"errors"
@@ -36,7 +36,7 @@ func ScenariosCLI(version string, vmFlags CLIRunConfig) {
 				}
 				path := cCtx.Args().First()
 
-				return run(path, vmFlags.ParseFlags(cCtx))
+				return RunScenariosAtPath(path, vmFlags.ParseFlags(cCtx))
 			},
 		},
 		{
