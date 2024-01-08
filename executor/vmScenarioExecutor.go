@@ -19,7 +19,7 @@ var TestVMType = []byte{0, 0}
 // ScenarioExecutor parses, interprets and executes both .test.json tests and .scen.json scenarios with VM.
 type ScenarioExecutor struct {
 	World             *worldmock.MockWorld
-	vmBuilder         ScenarioVMBuilder
+	vmBuilder         VMBuilder
 	vm                VMInterface
 	checkGas          bool
 	scenarioTraceGas  []bool
@@ -31,7 +31,7 @@ var _ mc.TestExecutor = (*ScenarioExecutor)(nil)
 var _ mc.ScenarioRunner = (*ScenarioExecutor)(nil)
 
 // NewScenarioExecutor prepares a new VMTestExecutor instance.
-func NewScenarioExecutor(vmBuilder ScenarioVMBuilder) *ScenarioExecutor {
+func NewScenarioExecutor(vmBuilder VMBuilder) *ScenarioExecutor {
 	world := worldmock.NewMockWorld()
 
 	return &ScenarioExecutor{

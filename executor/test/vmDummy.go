@@ -11,7 +11,7 @@ import (
 )
 
 var _ scenarioexec.VMInterface = (*DummyVM)(nil)
-var _ scenarioexec.ScenarioVMBuilder = (*DummyVMBuilder)(nil)
+var _ scenarioexec.VMBuilder = (*DummyVMBuilder)(nil)
 
 // DummyVM is a VM stand-in that can never be called.
 // Used for tests that do not require a VM.

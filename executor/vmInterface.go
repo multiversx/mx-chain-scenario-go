@@ -16,11 +16,11 @@ type VMInterface interface {
 	GetGasTrace() map[string]map[string][]uint64
 }
 
-// ScenarioVMBuilder defines VM initialization.
+// VMBuilder defines VM initialization.
 //
 // The VM is not passed directly to the scenario executor because the scenario can override the gas schedule,
 // which is required during initialization.
-type ScenarioVMBuilder interface {
+type VMBuilder interface {
 	// GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
 	GasScheduleMapFromScenarios(scenGasSchedule mj.GasSchedule) (worldmock.GasScheduleMap, error)
 
