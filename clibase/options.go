@@ -1,4 +1,4 @@
-package scencli
+package scenclibase
 
 import (
 	mc "github.com/multiversx/mx-chain-scenario-go/controller"
