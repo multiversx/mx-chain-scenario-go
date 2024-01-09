@@ -27,7 +27,6 @@ type ScenarioExecutor struct {
 	exprReconstructor er.ExprReconstructor
 }
 
-var _ mc.TestExecutor = (*ScenarioExecutor)(nil)
 var _ mc.ScenarioRunner = (*ScenarioExecutor)(nil)
 
 // NewScenarioExecutor prepares a new VMTestExecutor instance.
