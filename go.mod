@@ -5,7 +5,8 @@ go 1.20
 require (
 	github.com/TwiN/go-color v1.1.0
 	github.com/multiversx/mx-chain-core-go v1.2.13
-	github.com/multiversx/mx-chain-vm-common-go v1.5.2
+	github.com/multiversx/mx-chain-logger-go v1.0.13
+	github.com/multiversx/mx-chain-vm-common-go v1.5.9
 	github.com/multiversx/mx-components-big-int v1.0.0
 	github.com/stretchr/testify v1.8.1
 	golang.org/x/crypto v0.3.0
@@ -19,7 +20,6 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/mr-tron/base58 v1.2.0 // indirect
-	github.com/multiversx/mx-chain-logger-go v1.0.13 // indirect
 	github.com/pelletier/go-toml v1.9.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/sys v0.2.0 // indirect

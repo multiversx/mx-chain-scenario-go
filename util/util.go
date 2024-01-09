@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/multiversx/mx-chain-core-go/core"
@@ -38,7 +38,7 @@ func CreateMultiTransferData(to []byte, esdtData []*mj.ESDTTxData, endpointName 
 
 // GetSCCode retrieves the bytecode of a WASM module from a file
 func GetSCCode(fileName string) []byte {
-	code, err := ioutil.ReadFile(filepath.Clean(fileName))
+	code, err := os.ReadFile(filepath.Clean(fileName))
 	if err != nil {
 		panic(fmt.Sprintf("GetSCCode(): %s", fileName))
 	}
