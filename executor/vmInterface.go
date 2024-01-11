@@ -21,6 +21,9 @@ type VMInterface interface {
 // The VM is not passed directly to the scenario executor because the scenario can override the gas schedule,
 // which is required during initialization.
 type VMBuilder interface {
+	// NewMockWorld defines how the MockWorld is initialized.
+	NewMockWorld() *worldmock.MockWorld
+
 	// GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
 	GasScheduleMapFromScenarios(scenGasSchedule mj.GasSchedule) (worldmock.GasScheduleMap, error)
 

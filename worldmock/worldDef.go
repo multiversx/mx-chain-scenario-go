@@ -3,8 +3,15 @@ package worldmock
 import (
 	"fmt"
 
+	"github.com/multiversx/mx-chain-core-go/hashing/blake2b"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
+
+// DefaultHasher is an exposed value to use in tests
+var DefaultHasher = blake2b.NewBlake2b()
+
+// DefaultVMType is an exposed value to use in tests
+var DefaultVMType = []byte{0xF, 0xF}
 
 // NewAddressMock allows tests to specify what new addresses to generate
 type NewAddressMock struct {
@@ -34,6 +41,7 @@ func (bi *BlockInfo) GetRandomSeedSlice() []byte {
 // MockWorld provides a mock representation of the blockchain to be used in VM tests.
 type MockWorld struct {
 	SelfShardID                uint32
+	VMType                     []byte
 	AcctMap                    AccountMap
 	AccountsAdapter            vmcommon.AccountsAdapter
 	PreviousBlockInfo          *BlockInfo
