@@ -38,33 +38,13 @@ func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, _ []b
 
 	// If a mock address wasn't registered for the specified creatorAddress, generate one automatically.
 	// This is not the real algorithm but it's simple and close enough.
-	result := b.GenerateMockAddress(creatorAddress, creatorNonce)
-	b.LastCreatedContractAddress = result
-	return result, nil
-}
-
-// GenerateMockAddress simulates creation of a new address by the protocol.
-//
-// Not an actual blockchain hook, just a helper method.
-func (b *MockWorld) GenerateMockAddress(creatorAddress []byte, creatorNonce uint64) []byte {
-	result := make([]byte, 32)
-	result[10] = 0x11
-	result[11] = 0x11
-	result[12] = 0x11
-	result[13] = 0x11
-	copy(result[14:29], creatorAddress)
-
-	result[29] = byte(creatorNonce)
-
-	copy(result[30:], creatorAddress[30:])
-
 	vmType := b.VMType
 	if vmType == nil {
 		vmType = DefaultVMType
 	}
-
-	copy(result[vmcommon.NumInitCharactersForScAddress-core.VMTypeLen:], vmType)
-	return result
+	result := GenerateMockAddress(vmType, creatorAddress, creatorNonce)
+	b.LastCreatedContractAddress = result
+	return result, nil
 }
 
 // GetStorageData yields the storage value for a certain account and storage key.
