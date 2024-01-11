@@ -61,12 +61,19 @@ func (*DummyVM) GetGasTrace() map[string]map[string][]uint64 {
 // Used for tests that do not require a VM.
 type DummyVMBuilder struct{}
 
+// NewMockWorld defines how the MockWorld is initialized.
+func (*DummyVMBuilder) NewMockWorld() *worldmock.MockWorld {
+	return worldmock.NewMockWorld()
+}
+
+// GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
 func (*DummyVMBuilder) GasScheduleMapFromScenarios(scenGasSchedule mj.GasSchedule) (worldmock.GasScheduleMap, error) {
 	gasMap := make(map[string]map[string]uint64)
 	fillGasMapInternal(gasMap, 1)
 	return gasMap, nil
 }
 
+// NewVM creates the execution VM host with references to the world mock and gas schedule.
 func (*DummyVMBuilder) NewVM(world *worldmock.MockWorld, gasSchedule map[string]map[string]uint64) (scenarioexec.VMInterface, error) {
 	return &DummyVM{}, nil
 }

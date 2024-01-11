@@ -31,7 +31,7 @@ var _ mc.ScenarioRunner = (*ScenarioExecutor)(nil)
 
 // NewScenarioExecutor prepares a new VMTestExecutor instance.
 func NewScenarioExecutor(vmBuilder VMBuilder) *ScenarioExecutor {
-	world := worldmock.NewMockWorld()
+	world := vmBuilder.NewMockWorld()
 
 	return &ScenarioExecutor{
 		World:             world,
