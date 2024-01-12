@@ -6,7 +6,6 @@ import (
 
 	exporter "github.com/multiversx/mx-chain-scenario-go/scenario/exporter"
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
-	"github.com/multiversx/mx-chain-scenario-go/util"
 
 	"github.com/stretchr/testify/require"
 )
@@ -36,7 +35,7 @@ func TestGetAccountsAndTransactionsFrom_Adder(t *testing.T) {
 	expectedBenchmarkTxPos := 1
 
 	ownerAccount := exporter.SetNewAccount(1, addressOwner, big.NewInt(48), make(map[string][]byte), make([]byte, 0), make([]byte, 0))
-	scAccount := exporter.SetNewAccount(0, append(exporter.ScAddressPrefix, addressAdder[exporter.ScAddressPrefixLength:]...), big.NewInt(0), make(map[string][]byte), util.GetSCCode("adder.wasm"), addressOwner)
+	scAccount := exporter.SetNewAccount(0, append(exporter.ScAddressPrefix, addressAdder[exporter.ScAddressPrefixLength:]...), big.NewInt(0), make(map[string][]byte), exporter.GetSCCode("adder.wasm"), addressOwner)
 	deployedScAccount := exporter.SetNewAccount(0, append(exporter.ScAddressPrefix, addressDeployedAdder[exporter.ScAddressPrefixLength:]...), big.NewInt(0), make(map[string][]byte), make([]byte, 0), addressOwner)
 	expectedAccs = append(expectedAccs, ownerAccount, scAccount)
 	expectedDeployedAccs = append(expectedDeployedAccs, deployedScAccount)
@@ -61,7 +60,7 @@ func TestGetAccountsAndTransactionsFrom_AdderWithExternalSteps(t *testing.T) {
 	expectedBenchmarkTxPos := 1
 
 	ownerAccount := exporter.SetNewAccount(1, addressOwner, big.NewInt(48), make(map[string][]byte), make([]byte, 0), make([]byte, 0))
-	scAccount := exporter.SetNewAccount(0, append(exporter.ScAddressPrefix, addressAdder[exporter.ScAddressPrefixLength:]...), big.NewInt(0), make(map[string][]byte), util.GetSCCode("adder.wasm"), addressOwner)
+	scAccount := exporter.SetNewAccount(0, append(exporter.ScAddressPrefix, addressAdder[exporter.ScAddressPrefixLength:]...), big.NewInt(0), make(map[string][]byte), exporter.GetSCCode("adder.wasm"), addressOwner)
 	aliceAccount := exporter.SetNewAccount(5, addressAlice, big.NewInt(284), make(map[string][]byte), make([]byte, 0), make([]byte, 0))
 	bobAccount := exporter.SetNewAccount(3, addressBob, big.NewInt(11), make(map[string][]byte), make([]byte, 0), make([]byte, 0))
 	expectedAccs = append(expectedAccs, aliceAccount, scAccount, bobAccount, ownerAccount)

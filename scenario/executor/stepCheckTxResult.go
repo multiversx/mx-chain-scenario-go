@@ -142,3 +142,40 @@ func checkBytesListPretty(jcbl scenmodel.JSONCheckValueList) string {
 	}
 	return str + "]"
 }
+
+// this is a small hack, so we can reuse JSON printing in error messages
+func (ae *ScenarioExecutor) convertLogToTestFormat(outputLog *vmcommon.LogEntry) *scenmodel.LogEntry {
+	topics := scenmodel.JSONCheckValueList{
+		Values: make([]scenmodel.JSONCheckBytes, len(outputLog.Topics)),
+	}
+	for i, topic := range outputLog.Topics {
+		topics.Values[i] = scenmodel.JSONCheckBytesReconstructed(
+			topic,
+			ae.exprReconstructor.Reconstruct(topic,
+				er.NoHint))
+	}
+
+	dataField := scenmodel.JSONCheckValueList{
+		Values: make([]scenmodel.JSONCheckBytes, len(outputLog.Data)),
+	}
+	for i, data := range outputLog.Data {
+		dataField.Values[i] = scenmodel.JSONCheckBytesReconstructed(
+			data,
+			ae.exprReconstructor.Reconstruct(data,
+				er.NoHint))
+	}
+	testLog := scenmodel.LogEntry{
+		Address: scenmodel.JSONCheckBytesReconstructed(
+			outputLog.Address,
+			ae.exprReconstructor.Reconstruct(outputLog.Address,
+				er.AddressHint)),
+		Endpoint: scenmodel.JSONCheckBytesReconstructed(
+			outputLog.Identifier,
+			ae.exprReconstructor.Reconstruct(outputLog.Identifier,
+				er.StrHint)),
+		Data:   dataField,
+		Topics: topics,
+	}
+
+	return &testLog
+}

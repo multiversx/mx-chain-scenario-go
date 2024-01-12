@@ -31,3 +31,10 @@ func NewScenarioController(executor ScenarioRunner, fileResolver fr.FileResolver
 		Parser:   scenjparse.NewParser(fileResolver),
 	}
 }
+
+// NewDefaultFileResolver yields a new DefaultFileResolver instance.
+// Reexported here to avoid having all external packages importing the parser.
+// DefaultFileResolver is in parse for local tests only.
+func NewDefaultFileResolver() *fr.DefaultFileResolver {
+	return fr.NewDefaultFileResolver()
+}

@@ -49,6 +49,15 @@ func (jb JSONBytesFromTree) OriginalEmpty() bool {
 	return false
 }
 
+// JSONBytesFromTreeValues extracts values from a slice of JSONBytesFromTree into a list
+func JSONBytesFromTreeValues(jbs []JSONBytesFromTree) [][]byte {
+	result := make([][]byte, len(jbs))
+	for i, jb := range jbs {
+		result[i] = jb.Value
+	}
+	return result
+}
+
 // JSONBigInt stores the parsed big int value but also the original parsed string
 type JSONBigInt struct {
 	Value       *big.Int

@@ -7,6 +7,7 @@ import (
 	"math"
 	"math/big"
 
+	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
@@ -325,4 +326,34 @@ func (ae *ScenarioExecutor) updateStateAfterTx(
 	}
 
 	return nil
+}
+
+func generateTxHash(txIndex string) []byte {
+	txIndexBytes := []byte(txIndex)
+	if len(txIndexBytes) > 32 {
+		return txIndexBytes[:32]
+	}
+	for i := len(txIndexBytes); i < 32; i++ {
+		txIndexBytes = append(txIndexBytes, '.')
+	}
+	return txIndexBytes
+}
+
+func addESDTToVMInput(esdtData []*scenmodel.ESDTTxData, vmInput *vmcommon.VMInput) {
+	esdtDataLen := len(esdtData)
+
+	if esdtDataLen > 0 {
+		vmInput.ESDTTransfers = make([]*vmcommon.ESDTTransfer, esdtDataLen)
+		for i := 0; i < esdtDataLen; i++ {
+			vmInput.ESDTTransfers[i] = &vmcommon.ESDTTransfer{}
+			vmInput.ESDTTransfers[i].ESDTTokenName = esdtData[i].TokenIdentifier.Value
+			vmInput.ESDTTransfers[i].ESDTValue = esdtData[i].Value.Value
+			vmInput.ESDTTransfers[i].ESDTTokenNonce = esdtData[i].Nonce.Value
+			if vmInput.ESDTTransfers[i].ESDTTokenNonce != 0 {
+				vmInput.ESDTTransfers[i].ESDTTokenType = uint32(core.NonFungible)
+			} else {
+				vmInput.ESDTTransfers[i].ESDTTokenType = uint32(core.Fungible)
+			}
+		}
+	}
 }

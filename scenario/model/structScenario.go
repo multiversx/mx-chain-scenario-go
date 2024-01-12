@@ -35,6 +35,11 @@ type BlockInfo struct {
 // TraceGasStatus defines the trace gas status
 type TraceGasStatus int
 
+// ToInt returns the int representation of the current TraceGasStatus
+func (tgs TraceGasStatus) ToInt() int {
+	return int(tgs)
+}
+
 // constants defining all TraceGasStatus possible values
 const (
 	FalseValue TraceGasStatus = iota

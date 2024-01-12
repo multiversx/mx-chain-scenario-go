@@ -4,7 +4,6 @@ import (
 	"math/big"
 
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
-	"github.com/multiversx/mx-chain-scenario-go/util"
 	txDataBuilder "github.com/multiversx/mx-chain-vm-common-go/txDataBuilder"
 )
 
@@ -140,7 +139,7 @@ func (tx *Transaction) WithDeployData(scCodePath string, args [][]byte) *Transac
 }
 
 func createDeployTxData(scCodePath string, args [][]byte) []byte {
-	scCode := util.GetSCCode(scCodePath[contractCodePrefixLength:])
+	scCode := GetSCCode(scCodePath[contractCodePrefixLength:])
 	tdb := txDataBuilder.NewBuilder()
 	tdb.Bytes(scCode)
 	tdb.Bytes([]byte(vmTypeHex))
