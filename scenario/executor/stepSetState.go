@@ -8,8 +8,6 @@ import (
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
-
-	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
 // ExecuteSetStateStep executes a SetStateStep.
@@ -137,12 +135,8 @@ func convertAccount(testAcct *scenmodel.Account, world *worldmock.MockWorld) (*w
 		AsyncCallData:   testAcct.AsyncCallData,
 		ShardID:         uint32(testAcct.Shard.Value),
 		IsSmartContract: len(testAcct.Code.Value) > 0,
-		CodeMetadata: (&vmcommon.CodeMetadata{
-			Payable:     true,
-			Upgradeable: true,
-			Readable:    true,
-		}).ToBytes(), // TODO: add explicit fields in scenario JSON
-		MockWorld: world,
+		CodeMetadata:    testAcct.CodeMetadata.Value,
+		MockWorld:       world,
 	}
 
 	return account, nil

@@ -236,8 +236,9 @@ func (ae *ScenarioExecutor) scCreate(txIndex string, tx *scenmodel.Transaction, 
 	}
 	addESDTToVMInput(tx.ESDTValue, &vmInput)
 	input := &vmcommon.ContractCreateInput{
-		ContractCode: tx.Code.Value,
-		VMInput:      vmInput,
+		ContractCode:         tx.Code.Value,
+		ContractCodeMetadata: tx.CodeMetadata.Value,
+		VMInput:              vmInput,
 	}
 
 	return ae.vm.RunSmartContractCreate(input)

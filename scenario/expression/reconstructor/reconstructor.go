@@ -31,6 +31,9 @@ const (
 
 	// CodeHint hints that value should be a smart contract code, normally loaded from a file
 	CodeHint
+
+	// HexHint hints that value should be displayed simply as hex. Used for code metadata.
+	HexHint
 )
 
 const maxBytesInterpretedAsNumber = 15
@@ -51,6 +54,8 @@ func (er *ExprReconstructor) Reconstruct(value []byte, hint ExprReconstructorHin
 		return addressPretty(value, er.Bech32Addr)
 	case CodeHint:
 		return codePretty(value)
+	case HexHint:
+		return fmt.Sprintf("0x%s", hex.EncodeToString(value))
 	default:
 		return unknownByteArrayPretty(value)
 	}
