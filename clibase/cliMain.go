@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	mc "github.com/multiversx/mx-chain-scenario-go/controller"
+	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
 
 	cli "github.com/urfave/cli/v2"
 )

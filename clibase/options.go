@@ -1,8 +1,8 @@
 package scenclibase
 
 import (
-	mc "github.com/multiversx/mx-chain-scenario-go/controller"
-	scenexec "github.com/multiversx/mx-chain-scenario-go/executor"
+	scenexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
+	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
 	cli "github.com/urfave/cli/v2"
 )
 

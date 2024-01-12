@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/multiversx/mx-chain-core-go/core"
-	mj "github.com/multiversx/mx-chain-scenario-go/model"
+	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	txDataBuilder "github.com/multiversx/mx-chain-vm-common-go/txDataBuilder"
 )
 

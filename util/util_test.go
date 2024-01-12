@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"testing"
 
-	mj "github.com/multiversx/mx-chain-scenario-go/model"
+	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/stretchr/testify/require"
 )
 
