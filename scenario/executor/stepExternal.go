@@ -1,12 +1,12 @@
 package scenexec
 
 import (
-	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ExecuteExternalStep executes an external step referenced by the scenario.
-func (ae *ScenarioExecutor) ExecuteExternalStep(step *mj.ExternalStepsStep) error {
+func (ae *ScenarioExecutor) ExecuteExternalStep(step *scenmodel.ExternalStepsStep) error {
 	log.Trace("ExternalStepsStep", "path", step.Path)
 	if len(step.Comment) > 0 {
 		log.Trace("ExternalStepsStep", "comment", step.Comment)
@@ -14,12 +14,12 @@ func (ae *ScenarioExecutor) ExecuteExternalStep(step *mj.ExternalStepsStep) erro
 
 	fileResolverBackup := ae.fileResolver
 	clonedFileResolver := ae.fileResolver.Clone()
-	externalStepsRunner := mc.NewScenarioController(ae, clonedFileResolver)
+	externalStepsRunner := scenio.NewScenarioController(ae, clonedFileResolver)
 
 	extAbsPth := ae.fileResolver.ResolveAbsolutePath(step.Path)
 	setExternalStepGasTracing(ae, step)
 
-	err := externalStepsRunner.RunSingleJSONScenario(extAbsPth, mc.DefaultRunScenarioOptions())
+	err := externalStepsRunner.RunSingleJSONScenario(extAbsPth, scenio.DefaultRunScenarioOptions())
 	if err != nil {
 		return err
 	}

@@ -5,7 +5,7 @@ import (
 
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/esdt"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-vm-common-go/builtInFunctions"
 )
 
@@ -19,7 +19,7 @@ func MakeESDTUserMetadataBytes(frozen bool) []byte {
 }
 
 // WriteScenariosESDTToStorage writes the Scenarios ESDT data to the provided storage map
-func WriteScenariosESDTToStorage(esdtData []*mj.ESDTData, destination map[string][]byte) error {
+func WriteScenariosESDTToStorage(esdtData []*scenmodel.ESDTData, destination map[string][]byte) error {
 	for _, scenESDTData := range esdtData {
 		tokenIdentifier := scenESDTData.TokenIdentifier.Value
 		isFrozen := scenESDTData.Frozen.Value > 0

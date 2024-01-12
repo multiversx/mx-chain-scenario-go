@@ -1,4 +1,4 @@
-package scenjsonmodel
+package scenmodel
 
 // GasSchedule encodes the gas model to be used in scenario tests
 type GasSchedule int

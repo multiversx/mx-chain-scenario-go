@@ -8,7 +8,7 @@ import (
 
 	logger "github.com/multiversx/mx-chain-logger-go"
 	scenexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
-	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
 	"github.com/stretchr/testify/require"
 )
 
@@ -66,9 +66,9 @@ func (mtb *ScenariosTestBuilder) Run() *ScenariosTestBuilder {
 	executor := scenexec.NewScenarioExecutor(&DummyVMBuilder{})
 	defer executor.Close()
 
-	runner := mc.NewScenarioController(
+	runner := scenio.NewScenarioController(
 		executor,
-		mc.NewDefaultFileResolver(),
+		scenio.NewDefaultFileResolver(),
 	)
 
 	if len(mtb.singleFile) > 0 {
@@ -77,14 +77,14 @@ func (mtb *ScenariosTestBuilder) Run() *ScenariosTestBuilder {
 
 		mtb.currentError = runner.RunSingleJSONScenario(
 			fullPath,
-			mc.DefaultRunScenarioOptions())
+			scenio.DefaultRunScenarioOptions())
 	} else {
 		mtb.currentError = runner.RunAllJSONScenariosInDirectory(
 			getTestRoot(),
 			mtb.folder,
 			".scen.json",
 			mtb.exclusions,
-			mc.DefaultRunScenarioOptions())
+			scenio.DefaultRunScenarioOptions())
 	}
 
 	return mtb

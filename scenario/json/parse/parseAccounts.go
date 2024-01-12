@@ -5,41 +5,41 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) parseAccountAddress(addrRaw string) (mj.JSONBytesFromString, error) {
+func (p *Parser) parseAccountAddress(addrRaw string) (scenmodel.JSONBytesFromString, error) {
 	if len(addrRaw) == 0 {
-		return mj.JSONBytesFromString{}, errors.New("missing account address")
+		return scenmodel.JSONBytesFromString{}, errors.New("missing account address")
 	}
 	addrBytes, err := p.ExprInterpreter.InterpretString(addrRaw)
 	if err == nil && len(addrBytes) != 32 {
-		return mj.JSONBytesFromString{}, errors.New("account address is not 32 bytes in length")
+		return scenmodel.JSONBytesFromString{}, errors.New("account address is not 32 bytes in length")
 	}
-	return mj.NewJSONBytesFromString(addrBytes, addrRaw), err
+	return scenmodel.NewJSONBytesFromString(addrBytes, addrRaw), err
 }
 
-func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
+func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*scenmodel.Account, error) {
 	acctMap, isMap := acctRaw.(*oj.OJsonMap)
 	if !isMap {
 		return nil, errors.New("unmarshalled account object is not a map")
 	}
 
-	acct := mj.Account{
-		Shard:           mj.JSONUint64Zero(),
+	acct := scenmodel.Account{
+		Shard:           scenmodel.JSONUint64Zero(),
 		IsSmartContract: false,
 		Comment:         "",
-		Nonce:           mj.JSONUint64Zero(),
-		Balance:         mj.JSONBigIntZero(),
-		Username:        mj.JSONBytesEmpty(),
+		Nonce:           scenmodel.JSONUint64Zero(),
+		Balance:         scenmodel.JSONBigIntZero(),
+		Username:        scenmodel.JSONBytesEmpty(),
 		Storage:         nil,
-		Code:            mj.JSONBytesEmpty(),
-		CodeMetadata:    mj.JSONBytesEmpty(),
-		Owner:           mj.JSONBytesEmpty(),
+		Code:            scenmodel.JSONBytesEmpty(),
+		CodeMetadata:    scenmodel.JSONBytesEmpty(),
+		Owner:           scenmodel.JSONBytesEmpty(),
 		AsyncCallData:   "",
 		ESDTData:        nil,
 		Update:          false,
-		DeveloperReward: mj.JSONBigIntZero(),
+		DeveloperReward: scenmodel.JSONBigIntZero(),
 	}
 
 	var err error
@@ -81,7 +81,7 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 				if err != nil {
 					return nil, fmt.Errorf("invalid esdt token identifer: %w", err)
 				}
-				tokenName := mj.NewJSONBytesFromString(tokenNameStr, esdtKvp.Key)
+				tokenName := scenmodel.NewJSONBytesFromString(tokenNameStr, esdtKvp.Key)
 				esdtItem, err := p.processESDTData(tokenName, esdtKvp.Value)
 				if err != nil {
 					return nil, fmt.Errorf("invalid esdt value: %w", err)
@@ -107,8 +107,8 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 				if err != nil {
 					return nil, fmt.Errorf("invalid account storage value: %w", err)
 				}
-				stElem := mj.StorageKeyValuePair{
-					Key:   mj.NewJSONBytesFromString(byteKey, storageKvp.Key),
+				stElem := scenmodel.StorageKeyValuePair{
+					Key:   scenmodel.NewJSONBytesFromString(byteKey, storageKvp.Key),
 					Value: byteVal,
 				}
 				acct.Storage = append(acct.Storage, &stElem)
@@ -146,8 +146,8 @@ func (p *Parser) processAccount(acctRaw oj.OJsonObject) (*mj.Account, error) {
 	return &acct, nil
 }
 
-func (p *Parser) processAccountMap(acctMapRaw oj.OJsonObject) ([]*mj.Account, error) {
-	var accounts []*mj.Account
+func (p *Parser) processAccountMap(acctMapRaw oj.OJsonObject) ([]*scenmodel.Account, error) {
+	var accounts []*scenmodel.Account
 	preMap, isPreMap := acctMapRaw.(*oj.OJsonMap)
 	if !isPreMap {
 		return nil, errors.New("unmarshalled account map object is not a map")

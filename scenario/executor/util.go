@@ -7,13 +7,13 @@ import (
 
 	"github.com/multiversx/mx-chain-core-go/core"
 	er "github.com/multiversx/mx-chain-scenario-go/scenario/expression/reconstructor"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
-func convertAccount(testAcct *mj.Account, world *worldmock.MockWorld) (*worldmock.Account, error) {
+func convertAccount(testAcct *scenmodel.Account, world *worldmock.MockWorld) (*worldmock.Account, error) {
 	storage := make(map[string][]byte)
 	for _, stkvp := range testAcct.Storage {
 		key := string(stkvp.Key.Value)
@@ -53,7 +53,7 @@ func convertAccount(testAcct *mj.Account, world *worldmock.MockWorld) (*worldmoc
 	return account, nil
 }
 
-func validateSetStateAccount(scenAccount *mj.Account, converted *worldmock.Account) error {
+func validateSetStateAccount(scenAccount *scenmodel.Account, converted *worldmock.Account) error {
 	err := converted.Validate()
 	if err != nil {
 		return fmt.Errorf(
@@ -64,7 +64,7 @@ func validateSetStateAccount(scenAccount *mj.Account, converted *worldmock.Accou
 	return nil
 }
 
-func validateNewAddressMocks(testNAMs []*mj.NewAddressMock) error {
+func validateNewAddressMocks(testNAMs []*scenmodel.NewAddressMock) error {
 	for _, testNAM := range testNAMs {
 		if !worldmock.IsSmartContractAddress(testNAM.NewAddress.Value) {
 			return fmt.Errorf(
@@ -75,7 +75,7 @@ func validateNewAddressMocks(testNAMs []*mj.NewAddressMock) error {
 	return nil
 }
 
-func convertNewAddressMocks(testNAMs []*mj.NewAddressMock) []*worldmock.NewAddressMock {
+func convertNewAddressMocks(testNAMs []*scenmodel.NewAddressMock) []*worldmock.NewAddressMock {
 	var result []*worldmock.NewAddressMock
 	for _, testNAM := range testNAMs {
 		result = append(result, &worldmock.NewAddressMock{
@@ -87,7 +87,7 @@ func convertNewAddressMocks(testNAMs []*mj.NewAddressMock) []*worldmock.NewAddre
 	return result
 }
 
-func convertBlockInfo(testBlockInfo *mj.BlockInfo, currentInfo *worldmock.BlockInfo) *worldmock.BlockInfo {
+func convertBlockInfo(testBlockInfo *scenmodel.BlockInfo, currentInfo *worldmock.BlockInfo) *worldmock.BlockInfo {
 	if testBlockInfo == nil {
 		return currentInfo
 	}
@@ -130,32 +130,32 @@ func convertBlockInfo(testBlockInfo *mj.BlockInfo, currentInfo *worldmock.BlockI
 }
 
 // this is a small hack, so we can reuse JSON printing in error messages
-func (ae *ScenarioExecutor) convertLogToTestFormat(outputLog *vmcommon.LogEntry) *mj.LogEntry {
-	topics := mj.JSONCheckValueList{
-		Values: make([]mj.JSONCheckBytes, len(outputLog.Topics)),
+func (ae *ScenarioExecutor) convertLogToTestFormat(outputLog *vmcommon.LogEntry) *scenmodel.LogEntry {
+	topics := scenmodel.JSONCheckValueList{
+		Values: make([]scenmodel.JSONCheckBytes, len(outputLog.Topics)),
 	}
 	for i, topic := range outputLog.Topics {
-		topics.Values[i] = mj.JSONCheckBytesReconstructed(
+		topics.Values[i] = scenmodel.JSONCheckBytesReconstructed(
 			topic,
 			ae.exprReconstructor.Reconstruct(topic,
 				er.NoHint))
 	}
 
-	dataField := mj.JSONCheckValueList{
-		Values: make([]mj.JSONCheckBytes, len(outputLog.Data)),
+	dataField := scenmodel.JSONCheckValueList{
+		Values: make([]scenmodel.JSONCheckBytes, len(outputLog.Data)),
 	}
 	for i, data := range outputLog.Data {
-		dataField.Values[i] = mj.JSONCheckBytesReconstructed(
+		dataField.Values[i] = scenmodel.JSONCheckBytesReconstructed(
 			data,
 			ae.exprReconstructor.Reconstruct(data,
 				er.NoHint))
 	}
-	testLog := mj.LogEntry{
-		Address: mj.JSONCheckBytesReconstructed(
+	testLog := scenmodel.LogEntry{
+		Address: scenmodel.JSONCheckBytesReconstructed(
 			outputLog.Address,
 			ae.exprReconstructor.Reconstruct(outputLog.Address,
 				er.AddressHint)),
-		Endpoint: mj.JSONCheckBytesReconstructed(
+		Endpoint: scenmodel.JSONCheckBytesReconstructed(
 			outputLog.Identifier,
 			ae.exprReconstructor.Reconstruct(outputLog.Identifier,
 				er.StrHint)),
@@ -177,7 +177,7 @@ func generateTxHash(txIndex string) []byte {
 	return txIndexBytes
 }
 
-func addESDTToVMInput(esdtData []*mj.ESDTTxData, vmInput *vmcommon.VMInput) {
+func addESDTToVMInput(esdtData []*scenmodel.ESDTTxData, vmInput *vmcommon.VMInput) {
 	esdtDataLen := len(esdtData)
 
 	if esdtDataLen > 0 {
@@ -223,18 +223,18 @@ func setGasTraceInMetering(ae *ScenarioExecutor, enable bool) {
 	}
 }
 
-func setExternalStepGasTracing(ae *ScenarioExecutor, step *mj.ExternalStepsStep) {
+func setExternalStepGasTracing(ae *ScenarioExecutor, step *scenmodel.ExternalStepsStep) {
 	switch step.TraceGas.ToInt() {
-	case mj.Undefined.ToInt():
+	case scenmodel.Undefined.ToInt():
 		ae.scenarioTraceGas = append(ae.scenarioTraceGas, ae.PeekTraceGas())
-	case mj.TrueValue.ToInt():
+	case scenmodel.TrueValue.ToInt():
 		ae.scenarioTraceGas = append(ae.scenarioTraceGas, true)
-	case mj.FalseValue.ToInt():
+	case scenmodel.FalseValue.ToInt():
 		ae.scenarioTraceGas = append(ae.scenarioTraceGas, false)
 	}
 }
 
-func resetGasTracesIfNewTest(ae *ScenarioExecutor, scenario *mj.Scenario) {
+func resetGasTracesIfNewTest(ae *ScenarioExecutor, scenario *scenmodel.Scenario) {
 	if ae.vm == nil || scenario.IsNewTest {
 		ae.scenarioTraceGas = make([]bool, 0)
 		ae.scenarioTraceGas = append(ae.scenarioTraceGas, scenario.TraceGas)

@@ -2,11 +2,11 @@ package scenjsonwrite
 
 import (
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // AccountsToOJ converts a scenarios-format account to an ordered JSON representation.
-func AccountsToOJ(accounts []*mj.Account) oj.OJsonObject {
+func AccountsToOJ(accounts []*scenmodel.Account) oj.OJsonObject {
 	acctsOJ := oj.NewMap()
 	for _, account := range accounts {
 		acctOJ := oj.NewMap()
@@ -60,7 +60,7 @@ func AccountsToOJ(accounts []*mj.Account) oj.OJsonObject {
 	return acctsOJ
 }
 
-func checkAccountsToOJ(checkAccounts *mj.CheckAccounts) oj.OJsonObject {
+func checkAccountsToOJ(checkAccounts *scenmodel.CheckAccounts) oj.OJsonObject {
 	acctsOJ := oj.NewMap()
 	for _, checkAccount := range checkAccounts.Accounts {
 		acctOJ := oj.NewMap()

@@ -5,26 +5,26 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 func (p *Parser) processESDTData(
-	tokenName mj.JSONBytesFromString,
-	esdtDataRaw oj.OJsonObject) (*mj.ESDTData, error) {
+	tokenName scenmodel.JSONBytesFromString,
+	esdtDataRaw oj.OJsonObject) (*scenmodel.ESDTData, error) {
 
 	switch data := esdtDataRaw.(type) {
 	case *oj.OJsonString:
 		// simple string representing balance "400,000,000,000"
-		esdtData := mj.ESDTData{
+		esdtData := scenmodel.ESDTData{
 			TokenIdentifier: tokenName,
 		}
 		balance, err := p.processBigInt(esdtDataRaw, bigIntUnsignedBytes)
 		if err != nil {
 			return nil, fmt.Errorf("invalid ESDT balance: %w", err)
 		}
-		esdtData.Instances = []*mj.ESDTInstance{
+		esdtData.Instances = []*scenmodel.ESDTInstance{
 			{
-				Nonce:   mj.JSONUint64{Value: 0, Original: ""},
+				Nonce:   scenmodel.JSONUint64{Value: 0, Original: ""},
 				Balance: balance,
 			},
 		}
@@ -43,13 +43,13 @@ func (p *Parser) processESDTData(
 //	 "lastNonce": "5",
 //		"frozen": "true"
 //	}
-func (p *Parser) processESDTDataMap(tokenName mj.JSONBytesFromString, esdtDataMap *oj.OJsonMap) (*mj.ESDTData, error) {
-	esdtData := mj.ESDTData{
+func (p *Parser) processESDTDataMap(tokenName scenmodel.JSONBytesFromString, esdtDataMap *oj.OJsonMap) (*scenmodel.ESDTData, error) {
+	esdtData := scenmodel.ESDTData{
 		TokenIdentifier: tokenName,
 	}
-	firstInstance := &mj.ESDTInstance{}
+	firstInstance := &scenmodel.ESDTInstance{}
 	firstInstanceLoaded := false
-	var explicitInstances []*mj.ESDTInstance
+	var explicitInstances []*scenmodel.ESDTInstance
 
 	for _, kvp := range esdtDataMap.OrderedKV {
 		// it is allowed to load the instance directly, fields set to the first instance
@@ -91,14 +91,14 @@ func (p *Parser) processESDTDataMap(tokenName mj.JSONBytesFromString, esdtDataMa
 		if !p.AllowEsdtLegacySetSyntax {
 			return nil, fmt.Errorf("wrong ESDT set state syntax: instances in root no longer allowed")
 		}
-		esdtData.Instances = []*mj.ESDTInstance{firstInstance}
+		esdtData.Instances = []*scenmodel.ESDTInstance{firstInstance}
 	}
 	esdtData.Instances = append(esdtData.Instances, explicitInstances...)
 
 	return &esdtData, nil
 }
 
-func (p *Parser) tryProcessESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetInstance *mj.ESDTInstance) (bool, error) {
+func (p *Parser) tryProcessESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetInstance *scenmodel.ESDTInstance) (bool, error) {
 	var err error
 	switch kvp.Key {
 	case "nonce":
@@ -142,8 +142,8 @@ func (p *Parser) tryProcessESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetIn
 	return true, nil
 }
 
-func (p *Parser) processESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*mj.ESDTInstance, error) {
-	var instancesResult []*mj.ESDTInstance
+func (p *Parser) processESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*scenmodel.ESDTInstance, error) {
+	var instancesResult []*scenmodel.ESDTInstance
 	esdtInstancesList, isList := esdtInstancesRaw.(*oj.OJsonList)
 	if !isList {
 		return nil, errors.New("esdt instances object is not a list")
@@ -154,7 +154,7 @@ func (p *Parser) processESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*mj.ES
 			return nil, errors.New("JSON map expected as esdt instances list item")
 		}
 
-		instance := &mj.ESDTInstance{}
+		instance := &scenmodel.ESDTInstance{}
 
 		for _, kvp := range instanceAsMap.OrderedKV {
 			instanceFieldLoaded, err := p.tryProcessESDTInstanceField(kvp, instance)

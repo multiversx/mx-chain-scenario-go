@@ -8,12 +8,12 @@ import (
 	"math/big"
 
 	"github.com/multiversx/mx-chain-core-go/data/vm"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
 // ExecuteTxStep executes a TxStep.
-func (ae *ScenarioExecutor) ExecuteTxStep(step *mj.TxStep) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) ExecuteTxStep(step *scenmodel.TxStep) (*vmcommon.VMOutput, error) {
 	log.Trace("ExecuteTxStep", "id", step.TxIdent)
 	if len(step.Comment) > 0 {
 		log.Trace("ExecuteTxStep", "comment", step.Comment)
@@ -43,7 +43,7 @@ func (ae *ScenarioExecutor) ExecuteTxStep(step *mj.TxStep) (*vmcommon.VMOutput, 
 	return output, nil
 }
 
-func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
 	ae.World.CreateStateBackup()
 
 	var err error
@@ -92,7 +92,7 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmco
 		output = outOfFundsResult()
 	} else {
 		switch tx.Type {
-		case mj.ScDeploy:
+		case scenmodel.ScDeploy:
 			output, err = ae.scCreate(txIndex, tx, gasForExecution)
 			if err != nil {
 				return nil, err
@@ -100,7 +100,7 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmco
 			if ae.PeekTraceGas() {
 				fmt.Println("\nIn txID:", txIndex, ", step type:Deploy", ", total gas used:", gasForExecution-output.GasRemaining)
 			}
-		case mj.ScQuery:
+		case scenmodel.ScQuery:
 			// imitates the behaviour of the protocol
 			// the sender is the contract itself during SC queries
 			tx.From = tx.To
@@ -108,7 +108,7 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmco
 			tx.GasLimit.Value = math.MaxInt64
 			gasForExecution = math.MaxInt64
 			fallthrough
-		case mj.ScCall:
+		case scenmodel.ScCall:
 			output, err = ae.scCall(txIndex, tx, gasForExecution)
 			if err != nil {
 				return nil, err
@@ -116,9 +116,9 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmco
 			if ae.PeekTraceGas() {
 				fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
 			}
-		case mj.Transfer:
+		case scenmodel.Transfer:
 			output = ae.simpleTransferOutput(tx)
-		case mj.ValidatorReward:
+		case scenmodel.ValidatorReward:
 			output, err = ae.validatorRewardOutput(tx)
 			if err != nil {
 				return nil, err
@@ -142,7 +142,7 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *mj.Transaction) (*vmco
 	return output, nil
 }
 
-func (ae *ScenarioExecutor) senderHasEnoughBalance(tx *mj.Transaction) bool {
+func (ae *ScenarioExecutor) senderHasEnoughBalance(tx *scenmodel.Transaction) bool {
 	if !tx.Type.HasSender() {
 		return true
 	}
@@ -150,7 +150,7 @@ func (ae *ScenarioExecutor) senderHasEnoughBalance(tx *mj.Transaction) bool {
 	return sender.Balance.Cmp(tx.EGLDValue.Value) >= 0
 }
 
-func (ae *ScenarioExecutor) simpleTransferOutput(tx *mj.Transaction) *vmcommon.VMOutput {
+func (ae *ScenarioExecutor) simpleTransferOutput(tx *scenmodel.Transaction) *vmcommon.VMOutput {
 	outputAccounts := make(map[string]*vmcommon.OutputAccount)
 	outputAccounts[string(tx.To.Value)] = &vmcommon.OutputAccount{
 		Address:      tx.To.Value,
@@ -170,7 +170,7 @@ func (ae *ScenarioExecutor) simpleTransferOutput(tx *mj.Transaction) *vmcommon.V
 	}
 }
 
-func (ae *ScenarioExecutor) validatorRewardOutput(tx *mj.Transaction) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) validatorRewardOutput(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
 	reward := tx.EGLDValue.Value
 	recipient := ae.World.AcctMap.GetAccount(tx.To.Value)
 	if recipient == nil {
@@ -221,11 +221,11 @@ func outOfFundsResult() *vmcommon.VMOutput {
 	}
 }
 
-func (ae *ScenarioExecutor) scCreate(txIndex string, tx *mj.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) scCreate(txIndex string, tx *scenmodel.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
 	txHash := generateTxHash(txIndex)
 	vmInput := vmcommon.VMInput{
 		CallerAddr:     tx.From.Value,
-		Arguments:      mj.JSONBytesFromTreeValues(tx.Arguments),
+		Arguments:      scenmodel.JSONBytesFromTreeValues(tx.Arguments),
 		CallValue:      tx.EGLDValue.Value,
 		GasPrice:       tx.GasPrice.Value,
 		GasProvided:    gasLimit,
@@ -242,7 +242,7 @@ func (ae *ScenarioExecutor) scCreate(txIndex string, tx *mj.Transaction, gasLimi
 	return ae.vm.RunSmartContractCreate(input)
 }
 
-func (ae *ScenarioExecutor) scCall(txIndex string, tx *mj.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) scCall(txIndex string, tx *scenmodel.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
 	recipient := ae.World.AcctMap.GetAccount(tx.To.Value)
 	if recipient == nil {
 		return nil, fmt.Errorf("tx recipient (address: %s) does not exist", hex.EncodeToString(tx.To.Value))
@@ -253,7 +253,7 @@ func (ae *ScenarioExecutor) scCall(txIndex string, tx *mj.Transaction, gasLimit 
 	txHash := generateTxHash(txIndex)
 	vmInput := vmcommon.VMInput{
 		CallerAddr:     tx.From.Value,
-		Arguments:      mj.JSONBytesFromTreeValues(tx.Arguments),
+		Arguments:      scenmodel.JSONBytesFromTreeValues(tx.Arguments),
 		CallValue:      tx.EGLDValue.Value,
 		GasPrice:       tx.GasPrice.Value,
 		GasProvided:    gasLimit,
@@ -271,7 +271,7 @@ func (ae *ScenarioExecutor) scCall(txIndex string, tx *mj.Transaction, gasLimit 
 	return ae.vm.RunSmartContractCall(input)
 }
 
-func (ae *ScenarioExecutor) directESDTTransferFromTx(tx *mj.Transaction) (uint64, error) {
+func (ae *ScenarioExecutor) directESDTTransferFromTx(tx *scenmodel.Transaction) (uint64, error) {
 	nrTransfers := len(tx.ESDTValue)
 
 	if nrTransfers == 1 {
@@ -296,7 +296,7 @@ func (ae *ScenarioExecutor) directESDTTransferFromTx(tx *mj.Transaction) (uint64
 }
 
 func (ae *ScenarioExecutor) updateStateAfterTx(
-	tx *mj.Transaction,
+	tx *scenmodel.Transaction,
 	output *vmcommon.VMOutput) error {
 
 	// subtract call value from sender (this is not reflected in the delta)

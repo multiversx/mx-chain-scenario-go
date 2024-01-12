@@ -4,16 +4,16 @@ import (
 	"math/big"
 	"testing"
 
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/stretchr/testify/require"
 )
 
 func Test_CreateMultiTransferData_SingleTransfer(t *testing.T) {
-	esdtTransfers := make([]*mj.ESDTTxData, 0)
-	esdtTransfer := &mj.ESDTTxData{
-		Nonce:           mj.JSONUint64{Value: 0},
-		TokenIdentifier: mj.JSONBytesFromString{Value: []byte("TOK1-abcdef")},
-		Value:           mj.JSONBigInt{Value: big.NewInt(100)},
+	esdtTransfers := make([]*scenmodel.ESDTTxData, 0)
+	esdtTransfer := &scenmodel.ESDTTxData{
+		Nonce:           scenmodel.JSONUint64{Value: 0},
+		TokenIdentifier: scenmodel.JSONBytesFromString{Value: []byte("TOK1-abcdef")},
+		Value:           scenmodel.JSONBigInt{Value: big.NewInt(100)},
 	}
 	esdtTransfers = append(esdtTransfers, esdtTransfer)
 	data := CreateMultiTransferData(
@@ -27,16 +27,16 @@ func Test_CreateMultiTransferData_SingleTransfer(t *testing.T) {
 }
 
 func Test_CreateMultiTransferData_MultipleTransfers(t *testing.T) {
-	esdtTransfers := make([]*mj.ESDTTxData, 0)
-	esdtTransfer1 := &mj.ESDTTxData{
-		Nonce:           mj.JSONUint64{Value: 2},
-		TokenIdentifier: mj.JSONBytesFromString{Value: []byte("TOK1-abcdef")},
-		Value:           mj.JSONBigInt{Value: big.NewInt(100)},
+	esdtTransfers := make([]*scenmodel.ESDTTxData, 0)
+	esdtTransfer1 := &scenmodel.ESDTTxData{
+		Nonce:           scenmodel.JSONUint64{Value: 2},
+		TokenIdentifier: scenmodel.JSONBytesFromString{Value: []byte("TOK1-abcdef")},
+		Value:           scenmodel.JSONBigInt{Value: big.NewInt(100)},
 	}
-	esdtTransfer2 := &mj.ESDTTxData{
-		Nonce:           mj.JSONUint64{Value: 14},
-		TokenIdentifier: mj.JSONBytesFromString{Value: []byte("TOK2-abcdef")},
-		Value:           mj.JSONBigInt{Value: big.NewInt(396)},
+	esdtTransfer2 := &scenmodel.ESDTTxData{
+		Nonce:           scenmodel.JSONUint64{Value: 14},
+		TokenIdentifier: scenmodel.JSONBytesFromString{Value: []byte("TOK2-abcdef")},
+		Value:           scenmodel.JSONBigInt{Value: big.NewInt(396)},
 	}
 
 	esdtTransfers = append(esdtTransfers, esdtTransfer1, esdtTransfer2)

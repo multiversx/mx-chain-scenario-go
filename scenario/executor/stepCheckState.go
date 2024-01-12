@@ -8,7 +8,7 @@ import (
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
 	er "github.com/multiversx/mx-chain-scenario-go/scenario/expression/reconstructor"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 
@@ -18,7 +18,7 @@ import (
 )
 
 // ExecuteCheckStateStep executes a CheckStateStep defined by the current scenario.
-func (ae *ScenarioExecutor) ExecuteCheckStateStep(step *mj.CheckStateStep) error {
+func (ae *ScenarioExecutor) ExecuteCheckStateStep(step *scenmodel.CheckStateStep) error {
 	if len(step.Comment) > 0 {
 		log.Trace("CheckStateStep", "comment", step.Comment)
 	}
@@ -27,17 +27,17 @@ func (ae *ScenarioExecutor) ExecuteCheckStateStep(step *mj.CheckStateStep) error
 	return ae.checkAccounts(baseErrMsg, step.CheckAccounts)
 }
 
-func checkStateBaseErrorMsg(step *mj.CheckStateStep) string {
+func checkStateBaseErrorMsg(step *scenmodel.CheckStateStep) string {
 	if len(step.CheckStateIdent) > 0 {
 		return fmt.Sprintf("Check state \"%s\":", step.CheckStateIdent)
 	}
 	return "Check state:"
 }
 
-func (ae *ScenarioExecutor) checkAccounts(baseErrMsg string, checkAccounts *mj.CheckAccounts) error {
+func (ae *ScenarioExecutor) checkAccounts(baseErrMsg string, checkAccounts *scenmodel.CheckAccounts) error {
 	if !checkAccounts.MoreAccountsAllowed {
 		for worldAcctAddr := range ae.World.AcctMap {
-			postAcctMatch := mj.FindCheckAccount(checkAccounts.Accounts, []byte(worldAcctAddr))
+			postAcctMatch := scenmodel.FindCheckAccount(checkAccounts.Accounts, []byte(worldAcctAddr))
 			if postAcctMatch == nil && !bytes.Equal([]byte(worldAcctAddr), vmcommon.SystemAccountAddress) {
 				return fmt.Errorf("%s unexpected account address: %s",
 					baseErrMsg,
@@ -134,12 +134,12 @@ func (ae *ScenarioExecutor) checkAccounts(baseErrMsg string, checkAccounts *mj.C
 	return nil
 }
 
-func (ae *ScenarioExecutor) checkAccountStorage(baseErrMsg string, expectedAcct *mj.CheckAccount, matchingAcct *worldmock.Account) error {
+func (ae *ScenarioExecutor) checkAccountStorage(baseErrMsg string, expectedAcct *scenmodel.CheckAccount, matchingAcct *worldmock.Account) error {
 	if expectedAcct.IgnoreStorage {
 		return nil
 	}
 
-	expectedStorage := make(map[string]mj.JSONCheckBytes)
+	expectedStorage := make(map[string]scenmodel.JSONCheckBytes)
 	for _, stkvp := range expectedAcct.CheckStorage {
 		expectedStorage[string(stkvp.Key.Value)] = stkvp.CheckValue
 	}
@@ -163,10 +163,10 @@ func (ae *ScenarioExecutor) checkAccountStorage(baseErrMsg string, expectedAcct 
 			if expectedAcct.MoreStorageAllowed {
 				// if `"+": ""` was written in the test, any unspecified entries are allowed,
 				// which is equivalent to treating them all as "*".
-				want = mj.JSONCheckBytesStar()
+				want = scenmodel.JSONCheckBytesStar()
 			} else {
 				// otherwise, by default, any unexpected storage key leads to a test failure
-				want = mj.JSONCheckBytesUnspecified()
+				want = scenmodel.JSONCheckBytesUnspecified()
 			}
 		}
 		have := matchingAcct.StorageValue(k)
@@ -187,7 +187,7 @@ func (ae *ScenarioExecutor) checkAccountStorage(baseErrMsg string, expectedAcct 
 	return nil
 }
 
-func (ae *ScenarioExecutor) checkAccountESDT(baseErrMsg string, expectedAcct *mj.CheckAccount, matchingAcct *worldmock.Account) error {
+func (ae *ScenarioExecutor) checkAccountESDT(baseErrMsg string, expectedAcct *scenmodel.CheckAccount, matchingAcct *worldmock.Account) error {
 	if expectedAcct.IgnoreESDT {
 		return nil
 	}
@@ -217,13 +217,13 @@ func (ae *ScenarioExecutor) checkAccountESDT(baseErrMsg string, expectedAcct *mj
 		expectedToken := expectedTokens[tokenName]
 		accountToken := accountTokens[tokenName]
 		if expectedToken == nil {
-			expectedToken = &mj.CheckESDTData{
-				TokenIdentifier: mj.JSONBytesFromString{
+			expectedToken = &scenmodel.CheckESDTData{
+				TokenIdentifier: scenmodel.JSONBytesFromString{
 					Value:    []byte(tokenName),
 					Original: ae.exprReconstructor.Reconstruct([]byte(tokenName), er.StrHint),
 				},
-				Instances: []*mj.CheckESDTInstance{},
-				LastNonce: mj.JSONCheckUint64{Value: 0, Original: ""},
+				Instances: []*scenmodel.CheckESDTInstance{},
+				LastNonce: scenmodel.JSONCheckUint64{Value: 0, Original: ""},
 				Roles:     []string{},
 			}
 		} else if accountToken == nil {
@@ -246,8 +246,8 @@ func (ae *ScenarioExecutor) checkAccountESDT(baseErrMsg string, expectedAcct *mj
 	return nil
 }
 
-func getExpectedTokens(expectedAcct *mj.CheckAccount) map[string]*mj.CheckESDTData {
-	expectedTokens := make(map[string]*mj.CheckESDTData)
+func getExpectedTokens(expectedAcct *scenmodel.CheckAccount) map[string]*scenmodel.CheckESDTData {
+	expectedTokens := make(map[string]*scenmodel.CheckESDTData)
 	for _, expectedTokenData := range expectedAcct.CheckESDTData {
 		tokenName := expectedTokenData.TokenIdentifier.Value
 		expectedTokens[string(tokenName)] = expectedTokenData
@@ -259,7 +259,7 @@ func getExpectedTokens(expectedAcct *mj.CheckAccount) map[string]*mj.CheckESDTDa
 func (ae *ScenarioExecutor) checkTokenState(
 	accountAddress string,
 	tokenName string,
-	expectedToken *mj.CheckESDTData,
+	expectedToken *scenmodel.CheckESDTData,
 	accountToken *esdtconvert.MockESDTData,
 ) []error {
 
@@ -283,14 +283,14 @@ func (ae *ScenarioExecutor) checkTokenState(
 func (ae *ScenarioExecutor) checkTokenInstances(
 	_ string,
 	tokenName string,
-	expectedToken *mj.CheckESDTData,
+	expectedToken *scenmodel.CheckESDTData,
 	accountToken *esdtconvert.MockESDTData,
 ) []error {
 
 	var errors []error
 
 	allNonces := make(map[uint64]bool)
-	expectedInstances := make(map[uint64]*mj.CheckESDTInstance)
+	expectedInstances := make(map[uint64]*scenmodel.CheckESDTInstance)
 	accountInstances := make(map[uint64]*esdt.ESDigitalToken)
 	for _, expectedInstance := range expectedToken.Instances {
 		nonce := expectedInstance.Nonce.Value
@@ -308,9 +308,9 @@ func (ae *ScenarioExecutor) checkTokenInstances(
 		accountInstance := accountInstances[nonce]
 
 		if expectedInstance == nil {
-			expectedInstance = &mj.CheckESDTInstance{
-				Nonce:   mj.JSONUint64{Value: nonce, Original: ""},
-				Balance: mj.JSONCheckBigInt{Value: big.NewInt(0), Original: ""},
+			expectedInstance = &scenmodel.CheckESDTInstance{
+				Nonce:   scenmodel.JSONUint64{Value: nonce, Original: ""},
+				Balance: scenmodel.JSONCheckBigInt{Value: big.NewInt(0), Original: ""},
 			}
 		} else if accountInstance == nil {
 			accountInstance = &esdt.ESDigitalToken{
@@ -394,7 +394,7 @@ func (ae *ScenarioExecutor) checkTokenInstances(
 func checkTokenRoles(
 	accountAddress string,
 	tokenName string,
-	expectedToken *mj.CheckESDTData,
+	expectedToken *scenmodel.CheckESDTData,
 	accountToken *esdtconvert.MockESDTData) []error {
 
 	var errors []error

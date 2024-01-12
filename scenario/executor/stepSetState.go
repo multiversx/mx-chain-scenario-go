@@ -3,11 +3,11 @@ package scenexec
 import (
 	"errors"
 
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ExecuteSetStateStep executes a SetStateStep.
-func (ae *ScenarioExecutor) ExecuteSetStateStep(step *mj.SetStateStep) error {
+func (ae *ScenarioExecutor) ExecuteSetStateStep(step *scenmodel.SetStateStep) error {
 	if len(step.Comment) > 0 {
 		log.Trace("SetStateStep", "comment", step.Comment)
 	}
@@ -45,7 +45,7 @@ func (ae *ScenarioExecutor) ExecuteSetStateStep(step *mj.SetStateStep) error {
 }
 
 // PutNewAccount Puts a new account in world account map. Overwrites.
-func (ae *ScenarioExecutor) PutNewAccount(scenAccount *mj.Account) error {
+func (ae *ScenarioExecutor) PutNewAccount(scenAccount *scenmodel.Account) error {
 	worldAccount, err := convertAccount(scenAccount, ae.World)
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (ae *ScenarioExecutor) PutNewAccount(scenAccount *mj.Account) error {
 }
 
 // UpdateAccount Updates an account in world account map.
-func (ae *ScenarioExecutor) UpdateAccount(scenAccount *mj.Account) error {
+func (ae *ScenarioExecutor) UpdateAccount(scenAccount *scenmodel.Account) error {
 	worldAccount, err := convertAccount(scenAccount, ae.World)
 	if err != nil {
 		return err

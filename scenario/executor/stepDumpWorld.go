@@ -7,8 +7,8 @@ import (
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
 	er "github.com/multiversx/mx-chain-scenario-go/scenario/expression/reconstructor"
-	mjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 
@@ -18,24 +18,24 @@ import (
 
 const includeProtectedStorage = false
 
-func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmock.Account) (*mj.Account, error) {
+func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmock.Account) (*scenmodel.Account, error) {
 	var storageKeys []string
 	for storageKey := range account.Storage {
 		storageKeys = append(storageKeys, storageKey)
 	}
 
 	sort.Strings(storageKeys)
-	var storageKvps []*mj.StorageKeyValuePair
+	var storageKvps []*scenmodel.StorageKeyValuePair
 	for _, storageKey := range storageKeys {
 		storageValue := account.Storage[storageKey]
 		includeKey := includeProtectedStorage || !strings.HasPrefix(storageKey, core.ProtectedKeyPrefix)
 		if includeKey && len(storageValue) > 0 {
-			storageKvps = append(storageKvps, &mj.StorageKeyValuePair{
-				Key: mj.JSONBytesFromString{
+			storageKvps = append(storageKvps, &scenmodel.StorageKeyValuePair{
+				Key: scenmodel.JSONBytesFromString{
 					Value:    []byte(storageKey),
 					Original: ae.exprReconstructor.Reconstruct([]byte(storageKey), er.NoHint),
 				},
-				Value: mj.JSONBytesFromTree{
+				Value: scenmodel.JSONBytesFromTree{
 					Value:    storageValue,
 					Original: &oj.OJsonString{Value: ae.exprReconstructor.Reconstruct(storageValue, er.NoHint)},
 				},
@@ -57,7 +57,7 @@ func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmoc
 		esdtNames = append(esdtNames, esdtName)
 	}
 	sort.Strings(esdtNames)
-	var scenESDT []*mj.ESDTData
+	var scenESDT []*scenmodel.ESDTData
 	for _, esdtName := range esdtNames {
 		esdtObj := tokenData[esdtName]
 
@@ -66,72 +66,72 @@ func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmoc
 			scenRoles = append(scenRoles, string(mockRoles))
 		}
 
-		var scenInstances []*mj.ESDTInstance
+		var scenInstances []*scenmodel.ESDTInstance
 		for _, mockInstance := range esdtObj.Instances {
-			var creator mj.JSONBytesFromString
+			var creator scenmodel.JSONBytesFromString
 			if len(mockInstance.TokenMetaData.Creator) > 0 {
-				creator = mj.JSONBytesFromString{
+				creator = scenmodel.JSONBytesFromString{
 					Value:    mockInstance.TokenMetaData.Creator,
 					Original: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Creator, er.AddressHint),
 				}
 			}
 
-			var royalties mj.JSONUint64
+			var royalties scenmodel.JSONUint64
 			if mockInstance.TokenMetaData.Royalties > 0 {
-				royalties = mj.JSONUint64{
+				royalties = scenmodel.JSONUint64{
 					Value:    uint64(mockInstance.TokenMetaData.Royalties),
 					Original: ae.exprReconstructor.ReconstructFromUint64(uint64(mockInstance.TokenMetaData.Royalties)),
 				}
 			}
 
-			var hash mj.JSONBytesFromString
+			var hash scenmodel.JSONBytesFromString
 			if len(mockInstance.TokenMetaData.Hash) > 0 {
-				hash = mj.JSONBytesFromString{
+				hash = scenmodel.JSONBytesFromString{
 					Value:    mockInstance.TokenMetaData.Hash,
 					Original: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Hash, er.NoHint),
 				}
 			}
 
-			var jsonUris []mj.JSONBytesFromString
+			var jsonUris []scenmodel.JSONBytesFromString
 			for _, uri := range mockInstance.TokenMetaData.URIs {
-				jsonUris = append(jsonUris, mj.JSONBytesFromString{
+				jsonUris = append(jsonUris, scenmodel.JSONBytesFromString{
 					Value:    uri,
 					Original: ae.exprReconstructor.Reconstruct(uri, er.StrHint),
 				})
 			}
 
-			var attributes mj.JSONBytesFromTree
+			var attributes scenmodel.JSONBytesFromTree
 			if len(mockInstance.TokenMetaData.Attributes) > 0 {
-				attributes = mj.JSONBytesFromTree{
+				attributes = scenmodel.JSONBytesFromTree{
 					Value:    mockInstance.TokenMetaData.Attributes,
 					Original: &oj.OJsonString{Value: ae.exprReconstructor.Reconstruct(mockInstance.TokenMetaData.Attributes, er.NoHint)},
 				}
 			}
 
-			scenInstances = append(scenInstances, &mj.ESDTInstance{
-				Nonce: mj.JSONUint64{
+			scenInstances = append(scenInstances, &scenmodel.ESDTInstance{
+				Nonce: scenmodel.JSONUint64{
 					Value:    mockInstance.TokenMetaData.Nonce,
 					Original: ae.exprReconstructor.ReconstructFromUint64(mockInstance.TokenMetaData.Nonce),
 				},
-				Balance: mj.JSONBigInt{
+				Balance: scenmodel.JSONBigInt{
 					Value:    mockInstance.Value,
 					Original: ae.exprReconstructor.ReconstructFromBigInt(mockInstance.Value),
 				},
 				Creator:    creator,
 				Royalties:  royalties,
 				Hash:       hash,
-				Uris:       mj.JSONValueList{Values: jsonUris},
+				Uris:       scenmodel.JSONValueList{Values: jsonUris},
 				Attributes: attributes,
 			})
 		}
 
-		scenESDT = append(scenESDT, &mj.ESDTData{
-			TokenIdentifier: mj.JSONBytesFromString{
+		scenESDT = append(scenESDT, &scenmodel.ESDTData{
+			TokenIdentifier: scenmodel.JSONBytesFromString{
 				Value:    esdtObj.TokenIdentifier,
 				Original: ae.exprReconstructor.Reconstruct(esdtObj.TokenIdentifier, er.StrHint),
 			},
 			Instances: scenInstances,
-			LastNonce: mj.JSONUint64{
+			LastNonce: scenmodel.JSONUint64{
 				Value:    esdtObj.LastNonce,
 				Original: ae.exprReconstructor.ReconstructFromUint64(esdtObj.LastNonce),
 			},
@@ -139,22 +139,22 @@ func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmoc
 		})
 	}
 
-	return &mj.Account{
-		Address: mj.JSONBytesFromString{
+	return &scenmodel.Account{
+		Address: scenmodel.JSONBytesFromString{
 			Value:    account.Address,
 			Original: ae.exprReconstructor.Reconstruct(account.Address, er.AddressHint),
 		},
-		Nonce: mj.JSONUint64{
+		Nonce: scenmodel.JSONUint64{
 			Value:    account.Nonce,
 			Original: ae.exprReconstructor.ReconstructFromUint64(account.Nonce),
 		},
-		Balance: mj.JSONBigInt{
+		Balance: scenmodel.JSONBigInt{
 			Value:    account.Balance,
 			Original: ae.exprReconstructor.ReconstructFromBigInt(account.Balance),
 		},
 		Storage:  storageKvps,
 		ESDTData: scenESDT,
-		Owner: mj.JSONBytesFromString{
+		Owner: scenmodel.JSONBytesFromString{
 			Value:    account.OwnerAddress,
 			Original: ae.exprReconstructor.Reconstruct(account.OwnerAddress, er.AddressHint),
 		},
@@ -164,7 +164,7 @@ func (ae *ScenarioExecutor) convertMockAccountToScenarioFormat(account *worldmoc
 // DumpWorld prints the state of the MockWorld to stdout.
 func (ae *ScenarioExecutor) DumpWorld() error {
 	fmt.Print("world state dump:\n")
-	var scenAccounts []*mj.Account
+	var scenAccounts []*scenmodel.Account
 
 	for _, account := range ae.World.AcctMap {
 		scenAccount, err := ae.convertMockAccountToScenarioFormat(account)
@@ -174,7 +174,7 @@ func (ae *ScenarioExecutor) DumpWorld() error {
 		scenAccounts = append(scenAccounts, scenAccount)
 	}
 
-	ojAccount := mjwrite.AccountsToOJ(scenAccounts)
+	ojAccount := scenjwrite.AccountsToOJ(scenAccounts)
 	s := oj.JSONString(ojAccount)
 	fmt.Println(s)
 

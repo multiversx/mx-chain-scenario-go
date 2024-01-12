@@ -1,9 +1,9 @@
-package scencontroller
+package scenio
 
 import (
 	fr "github.com/multiversx/mx-chain-scenario-go/scenario/expression/fileresolver"
-	mjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ScenarioRunner describes a component that can run a VM scenario.
@@ -14,20 +14,20 @@ type ScenarioRunner interface {
 	// RunScenario executes the scenario and checks if it passed. Failure is signaled by returning an error.
 	// The FileResolver helps with resolving external steps.
 	// TODO: group into a "execution context" param.
-	RunScenario(*mj.Scenario, fr.FileResolver) error
+	RunScenario(*scenmodel.Scenario, fr.FileResolver) error
 }
 
 // ScenarioController is a component that can run json scenarios, using a provided executor.
 type ScenarioController struct {
 	Executor    ScenarioRunner
 	RunsNewTest bool
-	Parser      mjparse.Parser
+	Parser      scenjparse.Parser
 }
 
 // NewScenarioController creates new ScenarioController instance.
 func NewScenarioController(executor ScenarioRunner, fileResolver fr.FileResolver) *ScenarioController {
 	return &ScenarioController{
 		Executor: executor,
-		Parser:   mjparse.NewParser(fileResolver),
+		Parser:   scenjparse.NewParser(fileResolver),
 	}
 }

@@ -5,26 +5,26 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 func (p *Parser) processCheckESDTData(
-	tokenName mj.JSONBytesFromString,
-	esdtDataRaw oj.OJsonObject) (*mj.CheckESDTData, error) {
+	tokenName scenmodel.JSONBytesFromString,
+	esdtDataRaw oj.OJsonObject) (*scenmodel.CheckESDTData, error) {
 
 	switch data := esdtDataRaw.(type) {
 	case *oj.OJsonString:
 		// simple string representing balance "400,000,000,000"
-		esdtData := mj.CheckESDTData{
+		esdtData := scenmodel.CheckESDTData{
 			TokenIdentifier: tokenName,
 		}
 		balance, err := p.processCheckBigInt(esdtDataRaw, bigIntUnsignedBytes)
 		if err != nil {
 			return nil, fmt.Errorf("invalid ESDT balance: %w", err)
 		}
-		esdtData.Instances = []*mj.CheckESDTInstance{
+		esdtData.Instances = []*scenmodel.CheckESDTInstance{
 			{
-				Nonce:   mj.JSONUint64Zero(),
+				Nonce:   scenmodel.JSONUint64Zero(),
 				Balance: balance,
 			},
 		}
@@ -43,22 +43,22 @@ func (p *Parser) processCheckESDTData(
 //	 "lastNonce": "5",
 //		"frozen": "true"
 //	}
-func (p *Parser) processCheckESDTDataMap(tokenName mj.JSONBytesFromString, esdtDataMap *oj.OJsonMap) (*mj.CheckESDTData, error) {
-	esdtData := mj.CheckESDTData{
+func (p *Parser) processCheckESDTDataMap(tokenName scenmodel.JSONBytesFromString, esdtDataMap *oj.OJsonMap) (*scenmodel.CheckESDTData, error) {
+	esdtData := scenmodel.CheckESDTData{
 		TokenIdentifier: tokenName,
 	}
 	// var err error
-	firstInstance := &mj.CheckESDTInstance{
-		Nonce:      mj.JSONUint64Zero(),
-		Balance:    mj.JSONCheckBigIntUnspecified(),
-		Creator:    mj.JSONCheckBytesUnspecified(),
-		Royalties:  mj.JSONCheckUint64Unspecified(),
-		Hash:       mj.JSONCheckBytesUnspecified(),
-		Uris:       mj.JSONCheckValueListUnspecified(),
-		Attributes: mj.JSONCheckBytesUnspecified(),
+	firstInstance := &scenmodel.CheckESDTInstance{
+		Nonce:      scenmodel.JSONUint64Zero(),
+		Balance:    scenmodel.JSONCheckBigIntUnspecified(),
+		Creator:    scenmodel.JSONCheckBytesUnspecified(),
+		Royalties:  scenmodel.JSONCheckUint64Unspecified(),
+		Hash:       scenmodel.JSONCheckBytesUnspecified(),
+		Uris:       scenmodel.JSONCheckValueListUnspecified(),
+		Attributes: scenmodel.JSONCheckBytesUnspecified(),
 	}
 	firstInstanceLoaded := false
-	var explicitInstances []*mj.CheckESDTInstance
+	var explicitInstances []*scenmodel.CheckESDTInstance
 
 	for _, kvp := range esdtDataMap.OrderedKV {
 		// it is allowed to load the instance directly, fields set to the first instance
@@ -100,14 +100,14 @@ func (p *Parser) processCheckESDTDataMap(tokenName mj.JSONBytesFromString, esdtD
 		if !p.AllowEsdtLegacyCheckSyntax {
 			return nil, fmt.Errorf("wrong ESDT check state syntax: instances in root no longer allowed")
 		}
-		esdtData.Instances = []*mj.CheckESDTInstance{firstInstance}
+		esdtData.Instances = []*scenmodel.CheckESDTInstance{firstInstance}
 	}
 	esdtData.Instances = append(esdtData.Instances, explicitInstances...)
 
 	return &esdtData, nil
 }
 
-func (p *Parser) tryProcessCheckESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetInstance *mj.CheckESDTInstance) (bool, error) {
+func (p *Parser) tryProcessCheckESDTInstanceField(kvp *oj.OJsonKeyValuePair, targetInstance *scenmodel.CheckESDTInstance) (bool, error) {
 	var err error
 	switch kvp.Key {
 	case "nonce":
@@ -154,8 +154,8 @@ func (p *Parser) tryProcessCheckESDTInstanceField(kvp *oj.OJsonKeyValuePair, tar
 	return true, nil
 }
 
-func (p *Parser) processCheckESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*mj.CheckESDTInstance, error) {
-	var instancesResult []*mj.CheckESDTInstance
+func (p *Parser) processCheckESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*scenmodel.CheckESDTInstance, error) {
+	var instancesResult []*scenmodel.CheckESDTInstance
 	esdtInstancesList, isList := esdtInstancesRaw.(*oj.OJsonList)
 	if !isList {
 		return nil, errors.New("esdt instances object is not a list")
@@ -166,7 +166,7 @@ func (p *Parser) processCheckESDTInstances(esdtInstancesRaw oj.OJsonObject) ([]*
 			return nil, errors.New("JSON map expected as esdt instances list item")
 		}
 
-		instance := mj.NewCheckESDTInstance()
+		instance := scenmodel.NewCheckESDTInstance()
 
 		for _, kvp := range instanceAsMap.OrderedKV {
 			instanceFieldLoaded, err := p.tryProcessCheckESDTInstanceField(kvp, instance)

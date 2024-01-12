@@ -1,17 +1,17 @@
-package scencontroller
+package scenio
 
 import (
 	"io"
 	"os"
 	"path/filepath"
 
-	mjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
-	mjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
+	scenjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ParseScenariosScenario reads and parses a Scenarios scenario from a JSON file.
-func ParseScenariosScenario(parser mjparse.Parser, scenFilePath string) (*mj.Scenario, error) {
+func ParseScenariosScenario(parser scenjparse.Parser, scenFilePath string) (*scenmodel.Scenario, error) {
 	var err error
 	scenFilePath, err = filepath.Abs(scenFilePath)
 	if err != nil {
@@ -41,15 +41,15 @@ func ParseScenariosScenario(parser mjparse.Parser, scenFilePath string) (*mj.Sce
 }
 
 // ParseScenariosScenarioDefaultParser reads and parses a Scenarios scenario from a JSON file.
-func ParseScenariosScenarioDefaultParser(scenFilePath string) (*mj.Scenario, error) {
-	parser := mjparse.NewParser(NewDefaultFileResolver())
+func ParseScenariosScenarioDefaultParser(scenFilePath string) (*scenmodel.Scenario, error) {
+	parser := scenjparse.NewParser(NewDefaultFileResolver())
 	parser.ExprInterpreter.FileResolver.SetContext(scenFilePath)
 	return ParseScenariosScenario(parser, scenFilePath)
 }
 
 // WriteScenariosScenario exports a Scenarios scenario to a file, using the default formatting.
-func WriteScenariosScenario(scenario *mj.Scenario, toPath string) error {
-	jsonString := mjwrite.ScenarioToJSONString(scenario)
+func WriteScenariosScenario(scenario *scenmodel.Scenario, toPath string) error {
+	jsonString := scenjwrite.ScenarioToJSONString(scenario)
 
 	err := os.MkdirAll(filepath.Dir(toPath), os.ModePerm)
 	if err != nil {

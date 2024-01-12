@@ -5,32 +5,32 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, error) {
+func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*scenmodel.CheckAccount, error) {
 	acctMap, isMap := acctRaw.(*oj.OJsonMap)
 	if !isMap {
 		return nil, errors.New("unmarshalled account object is not a map")
 	}
 
-	acct := mj.CheckAccount{
+	acct := scenmodel.CheckAccount{
 		Comment:               "",
-		Nonce:                 mj.JSONCheckUint64Unspecified(),
-		Balance:               mj.JSONCheckBigIntUnspecified(),
-		Username:              mj.JSONCheckBytesUnspecified(),
+		Nonce:                 scenmodel.JSONCheckUint64Unspecified(),
+		Balance:               scenmodel.JSONCheckBigIntUnspecified(),
+		Username:              scenmodel.JSONCheckBytesUnspecified(),
 		ExplicitStorage:       false,
 		IgnoreStorage:         true,
 		MoreStorageAllowed:    false,
 		CheckStorage:          nil,
-		Code:                  mj.JSONCheckBytesUnspecified(),
-		CodeMetadata:          mj.JSONCheckBytesUnspecified(),
-		Owner:                 mj.JSONCheckBytesUnspecified(),
-		AsyncCallData:         mj.JSONCheckBytesUnspecified(),
+		Code:                  scenmodel.JSONCheckBytesUnspecified(),
+		CodeMetadata:          scenmodel.JSONCheckBytesUnspecified(),
+		Owner:                 scenmodel.JSONCheckBytesUnspecified(),
+		AsyncCallData:         scenmodel.JSONCheckBytesUnspecified(),
 		IgnoreESDT:            false,
 		MoreESDTTokensAllowed: false,
 		CheckESDTData:         nil,
-		DeveloperReward:       mj.JSONCheckBigIntUnspecified(),
+		DeveloperReward:       scenmodel.JSONCheckBigIntUnspecified(),
 	}
 	var err error
 
@@ -66,7 +66,7 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 						if err != nil {
 							return nil, fmt.Errorf("invalid esdt token identifer: %w", err)
 						}
-						tokenName := mj.NewJSONBytesFromString(tokenNameStr, esdtKvp.Key)
+						tokenName := scenmodel.NewJSONBytesFromString(tokenNameStr, esdtKvp.Key)
 						esdtItem, err := p.processCheckESDTData(tokenName, esdtKvp.Value)
 						if err != nil {
 							return nil, fmt.Errorf("invalid esdt value: %w", err)
@@ -100,8 +100,8 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 						if err != nil {
 							return nil, fmt.Errorf("invalid account storage value: %w", err)
 						}
-						stElem := mj.CheckStorageKeyValuePair{
-							Key:        mj.NewJSONBytesFromString(byteKey, storageKvp.Key),
+						stElem := scenmodel.CheckStorageKeyValuePair{
+							Key:        scenmodel.NewJSONBytesFromString(byteKey, storageKvp.Key),
 							CheckValue: byteVal,
 						}
 						acct.CheckStorage = append(acct.CheckStorage, &stElem)
@@ -142,8 +142,8 @@ func (p *Parser) processCheckAccount(acctRaw oj.OJsonObject) (*mj.CheckAccount, 
 	return &acct, nil
 }
 
-func (p *Parser) processCheckAccountMap(acctMapRaw oj.OJsonObject) (*mj.CheckAccounts, error) {
-	var checkAccounts = &mj.CheckAccounts{
+func (p *Parser) processCheckAccountMap(acctMapRaw oj.OJsonObject) (*scenmodel.CheckAccounts, error) {
+	var checkAccounts = &scenmodel.CheckAccounts{
 		Accounts:            nil,
 		MoreAccountsAllowed: false,
 	}

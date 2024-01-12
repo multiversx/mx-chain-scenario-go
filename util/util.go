@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 
 	"github.com/multiversx/mx-chain-core-go/core"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	txDataBuilder "github.com/multiversx/mx-chain-vm-common-go/txDataBuilder"
 )
 
 // CreateMultiTransferData builds data for a multiTransferESDT
-func CreateMultiTransferData(to []byte, esdtData []*mj.ESDTTxData, endpointName string, arguments [][]byte) []byte {
+func CreateMultiTransferData(to []byte, esdtData []*scenmodel.ESDTTxData, endpointName string, arguments [][]byte) []byte {
 
 	multiTransferData := make([]byte, 0)
 	multiTransferData = append(multiTransferData, []byte(core.BuiltInFunctionMultiESDTNFTTransfer)...)

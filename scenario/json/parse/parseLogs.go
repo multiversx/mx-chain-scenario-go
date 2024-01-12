@@ -5,12 +5,12 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processLogList(logsRaw oj.OJsonObject) (mj.LogList, error) {
+func (p *Parser) processLogList(logsRaw oj.OJsonObject) (scenmodel.LogList, error) {
 	if IsStar(logsRaw) {
-		return mj.LogList{
+		return scenmodel.LogList{
 			IsUnspecified: false,
 			IsStar:        true,
 		}, nil
@@ -18,9 +18,9 @@ func (p *Parser) processLogList(logsRaw oj.OJsonObject) (mj.LogList, error) {
 
 	logList, isList := logsRaw.(*oj.OJsonList)
 	if !isList {
-		return mj.LogList{}, errors.New("unmarshalled logs list is not a list")
+		return scenmodel.LogList{}, errors.New("unmarshalled logs list is not a list")
 	}
-	result := mj.LogList{
+	result := scenmodel.LogList{
 		IsUnspecified:    false,
 		IsStar:           false,
 		MoreAllowedAtEnd: false,
@@ -33,43 +33,43 @@ func (p *Parser) processLogList(logsRaw oj.OJsonObject) (mj.LogList, error) {
 			if logItem.Value == "+" {
 				result.MoreAllowedAtEnd = true
 			} else {
-				return mj.LogList{}, errors.New("unmarshalled log entry is an invalid string")
+				return scenmodel.LogList{}, errors.New("unmarshalled log entry is an invalid string")
 			}
 		case *oj.OJsonMap:
 			if result.MoreAllowedAtEnd {
-				return mj.LogList{}, errors.New("log entry ")
+				return scenmodel.LogList{}, errors.New("log entry ")
 			}
 
-			logEntry := mj.LogEntry{}
+			logEntry := scenmodel.LogEntry{}
 			for _, kvp := range logItem.OrderedKV {
 				switch kvp.Key {
 				case "address":
 					logEntry.Address, err = p.parseCheckBytes(kvp.Value)
 					if err != nil {
-						return mj.LogList{}, fmt.Errorf("invalid log address: %w", err)
+						return scenmodel.LogList{}, fmt.Errorf("invalid log address: %w", err)
 					}
 				case "endpoint":
 					logEntry.Endpoint, err = p.parseCheckBytes(kvp.Value)
 					if err != nil {
-						return mj.LogList{}, fmt.Errorf("invalid log identifier: %w", err)
+						return scenmodel.LogList{}, fmt.Errorf("invalid log identifier: %w", err)
 					}
 				case "topics":
 					logEntry.Topics, err = p.parseCheckValueList(kvp.Value)
 					if err != nil {
-						return mj.LogList{}, fmt.Errorf("invalid log entry topics: %w", err)
+						return scenmodel.LogList{}, fmt.Errorf("invalid log entry topics: %w", err)
 					}
 				case "data":
 					logEntry.Data, err = p.parseCheckValueList(kvp.Value)
 					if err != nil {
-						return mj.LogList{}, fmt.Errorf("invalid log data: %w", err)
+						return scenmodel.LogList{}, fmt.Errorf("invalid log data: %w", err)
 					}
 				default:
-					return mj.LogList{}, fmt.Errorf("unknown log field: %s", kvp.Key)
+					return scenmodel.LogList{}, fmt.Errorf("unknown log field: %s", kvp.Key)
 				}
 			}
 			result.List = append(result.List, &logEntry)
 		default:
-			return mj.LogList{}, errors.New("log entry should be either string or object")
+			return scenmodel.LogList{}, errors.New("log entry should be either string or object")
 		}
 	}
 

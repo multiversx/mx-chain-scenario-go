@@ -5,22 +5,22 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processNewAddressMocks(namsRaw oj.OJsonObject) ([]*mj.NewAddressMock, error) {
+func (p *Parser) processNewAddressMocks(namsRaw oj.OJsonObject) ([]*scenmodel.NewAddressMock, error) {
 	namList, isList := namsRaw.(*oj.OJsonList)
 	if !isList {
 		return nil, errors.New("newAddresses list is not a list")
 	}
-	var namEntries []*mj.NewAddressMock
+	var namEntries []*scenmodel.NewAddressMock
 	var err error
 	for _, namRaw := range namList.AsList() {
 		namMap, isMap := namRaw.(*oj.OJsonMap)
 		if !isMap {
 			return nil, errors.New("new address mock entry is not a map")
 		}
-		namEntry := mj.NewAddressMock{}
+		namEntry := scenmodel.NewAddressMock{}
 		for _, kvp := range namMap.OrderedKV {
 			switch kvp.Key {
 			case "creatorAddress":

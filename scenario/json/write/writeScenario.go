@@ -2,17 +2,17 @@ package scenjsonwrite
 
 import (
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ScenarioToJSONString converts a scenario object to its JSON representation.
-func ScenarioToJSONString(scenario *mj.Scenario) string {
+func ScenarioToJSONString(scenario *scenmodel.Scenario) string {
 	jobj := ScenarioToOrderedJSON(scenario)
 	return oj.JSONString(jobj) + "\n"
 }
 
 // ScenarioToOrderedJSON converts a scenario object to an ordered JSON object.
-func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
+func ScenarioToOrderedJSON(scenario *scenmodel.Scenario) oj.OJsonObject {
 	scenarioOJ := oj.NewMap()
 
 	if len(scenario.Name) > 0 {
@@ -33,7 +33,7 @@ func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
 		scenarioOJ.Put("traceGas", &ojTrue)
 	}
 
-	if scenario.GasSchedule != mj.GasScheduleDefault {
+	if scenario.GasSchedule != scenmodel.GasScheduleDefault {
 		scenarioOJ.Put("gasSchedule", gasScheduleToOJ(scenario.GasSchedule))
 	}
 
@@ -43,12 +43,12 @@ func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
 		stepOJ := oj.NewMap()
 		stepOJ.Put("step", stringToOJ(generalStep.StepTypeName()))
 		switch step := generalStep.(type) {
-		case *mj.ExternalStepsStep:
+		case *scenmodel.ExternalStepsStep:
 			if len(step.Comment) > 0 {
 				stepOJ.Put("comment", stringToOJ(step.Comment))
 			}
 			stepOJ.Put("path", stringToOJ(step.Path))
-		case *mj.SetStateStep:
+		case *scenmodel.SetStateStep:
 			if len(step.SetStateIdent) > 0 {
 				stepOJ.Put("id", stringToOJ(step.SetStateIdent))
 			}
@@ -70,7 +70,7 @@ func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
 			if !step.BlockHashes.IsUnspecified() {
 				stepOJ.Put("blockHashes", valueListToOJ(step.BlockHashes))
 			}
-		case *mj.CheckStateStep:
+		case *scenmodel.CheckStateStep:
 			if len(step.CheckStateIdent) > 0 {
 				stepOJ.Put("id", stringToOJ(step.CheckStateIdent))
 			}
@@ -78,11 +78,11 @@ func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
 				stepOJ.Put("comment", stringToOJ(step.Comment))
 			}
 			stepOJ.Put("accounts", checkAccountsToOJ(step.CheckAccounts))
-		case *mj.DumpStateStep:
+		case *scenmodel.DumpStateStep:
 			if len(step.Comment) > 0 {
 				stepOJ.Put("comment", stringToOJ(step.Comment))
 			}
-		case *mj.TxStep:
+		case *scenmodel.TxStep:
 			if len(step.TxIdent) > 0 {
 				stepOJ.Put("id", stringToOJ(step.TxIdent))
 			}
@@ -107,7 +107,7 @@ func ScenarioToOrderedJSON(scenario *mj.Scenario) oj.OJsonObject {
 	return scenarioOJ
 }
 
-func transactionToScenarioOJ(tx *mj.Transaction) oj.OJsonObject {
+func transactionToScenarioOJ(tx *scenmodel.Transaction) oj.OJsonObject {
 	transactionOJ := oj.NewMap()
 	if tx.Type.HasSender() {
 		transactionOJ.Put("from", bytesFromStringToOJ(tx.From))
@@ -125,11 +125,11 @@ func transactionToScenarioOJ(tx *mj.Transaction) oj.OJsonObject {
 	if tx.Type.HasFunction() {
 		transactionOJ.Put("function", stringToOJ(tx.Function))
 	}
-	if tx.Type == mj.ScDeploy || tx.Type == mj.ScUpgrade {
+	if tx.Type == scenmodel.ScDeploy || tx.Type == scenmodel.ScUpgrade {
 		transactionOJ.Put("contractCode", bytesFromStringToOJ(tx.Code))
 	}
 
-	if tx.Type.HasFunction() || tx.Type == mj.ScDeploy {
+	if tx.Type.HasFunction() || tx.Type == scenmodel.ScDeploy {
 		var argList []oj.OJsonObject
 		for _, arg := range tx.Arguments {
 			argList = append(argList, bytesFromTreeToOJ(arg))
@@ -149,7 +149,7 @@ func transactionToScenarioOJ(tx *mj.Transaction) oj.OJsonObject {
 	return transactionOJ
 }
 
-func newAddressMocksToOJ(newAddressMocks []*mj.NewAddressMock) oj.OJsonObject {
+func newAddressMocksToOJ(newAddressMocks []*scenmodel.NewAddressMock) oj.OJsonObject {
 	var namList []oj.OJsonObject
 	for _, namEntry := range newAddressMocks {
 		namOJ := oj.NewMap()
@@ -162,7 +162,7 @@ func newAddressMocksToOJ(newAddressMocks []*mj.NewAddressMock) oj.OJsonObject {
 	return &namOJList
 }
 
-func blockInfoToOJ(blockInfo *mj.BlockInfo) oj.OJsonObject {
+func blockInfoToOJ(blockInfo *scenmodel.BlockInfo) oj.OJsonObject {
 	blockInfoOJ := oj.NewMap()
 	if len(blockInfo.BlockTimestamp.Original) > 0 {
 		blockInfoOJ.Put("blockTimestamp", uint64ToOJ(blockInfo.BlockTimestamp))
@@ -183,15 +183,15 @@ func blockInfoToOJ(blockInfo *mj.BlockInfo) oj.OJsonObject {
 	return blockInfoOJ
 }
 
-func gasScheduleToOJ(gasSchedule mj.GasSchedule) oj.OJsonObject {
+func gasScheduleToOJ(gasSchedule scenmodel.GasSchedule) oj.OJsonObject {
 	switch gasSchedule {
-	case mj.GasScheduleDefault:
+	case scenmodel.GasScheduleDefault:
 		return stringToOJ("default")
-	case mj.GasScheduleDummy:
+	case scenmodel.GasScheduleDummy:
 		return stringToOJ("dummy")
-	case mj.GasScheduleV3:
+	case scenmodel.GasScheduleV3:
 		return stringToOJ("v3")
-	case mj.GasScheduleV4:
+	case scenmodel.GasScheduleV4:
 		return stringToOJ("v4")
 	default:
 		return stringToOJ("")

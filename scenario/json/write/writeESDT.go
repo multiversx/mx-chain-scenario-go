@@ -2,10 +2,10 @@ package scenjsonwrite
 
 import (
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func esdtTxDataToOJ(esdtItems []*mj.ESDTTxData) oj.OJsonObject {
+func esdtTxDataToOJ(esdtItems []*scenmodel.ESDTTxData) oj.OJsonObject {
 	esdtItemList := oj.OJsonList{}
 	for _, esdtItemRaw := range esdtItems {
 		esdtItemOJ := esdtTxRawEntryToOJ(esdtItemRaw)
@@ -16,7 +16,7 @@ func esdtTxDataToOJ(esdtItems []*mj.ESDTTxData) oj.OJsonObject {
 
 }
 
-func esdtTxRawEntryToOJ(esdtItemRaw *mj.ESDTTxData) *oj.OJsonMap {
+func esdtTxRawEntryToOJ(esdtItemRaw *scenmodel.ESDTTxData) *oj.OJsonMap {
 	esdtItemOJ := oj.NewMap()
 
 	if len(esdtItemRaw.TokenIdentifier.Original) > 0 {
@@ -32,7 +32,7 @@ func esdtTxRawEntryToOJ(esdtItemRaw *mj.ESDTTxData) *oj.OJsonMap {
 	return esdtItemOJ
 }
 
-func esdtDataToOJ(esdtItems []*mj.ESDTData) *oj.OJsonMap {
+func esdtDataToOJ(esdtItems []*scenmodel.ESDTData) *oj.OJsonMap {
 	esdtItemsOJ := oj.NewMap()
 	for _, esdtItem := range esdtItems {
 		esdtItemsOJ.Put(esdtItem.TokenIdentifier.Original, esdtItemToOJ(esdtItem))
@@ -40,7 +40,7 @@ func esdtDataToOJ(esdtItems []*mj.ESDTData) *oj.OJsonMap {
 	return esdtItemsOJ
 }
 
-func esdtItemToOJ(esdtItem *mj.ESDTData) oj.OJsonObject {
+func esdtItemToOJ(esdtItem *scenmodel.ESDTData) oj.OJsonObject {
 	if isCompactESDT(esdtItem) {
 		return bigIntToOJ(esdtItem.Instances[0].Balance)
 	}
@@ -79,7 +79,7 @@ func esdtItemToOJ(esdtItem *mj.ESDTData) oj.OJsonObject {
 	return esdtItemOJ
 }
 
-func appendESDTInstanceToOJ(esdtInstance *mj.ESDTInstance, targetOj *oj.OJsonMap) {
+func appendESDTInstanceToOJ(esdtInstance *scenmodel.ESDTInstance, targetOj *oj.OJsonMap) {
 	targetOj.Put("nonce", uint64ToOJ(esdtInstance.Nonce))
 
 	if len(esdtInstance.Balance.Original) > 0 {
@@ -102,7 +102,7 @@ func appendESDTInstanceToOJ(esdtInstance *mj.ESDTInstance, targetOj *oj.OJsonMap
 	}
 }
 
-func isCompactESDT(esdtItem *mj.ESDTData) bool {
+func isCompactESDT(esdtItem *scenmodel.ESDTData) bool {
 	if len(esdtItem.Instances) != 1 {
 		return false
 	}

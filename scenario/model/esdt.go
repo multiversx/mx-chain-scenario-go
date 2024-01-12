@@ -1,4 +1,4 @@
-package scenjsonmodel
+package scenmodel
 
 // ESDTTxData models the transfer of tokens in a tx
 type ESDTTxData struct {

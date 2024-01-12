@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // ParseScenarioFile converts a scenario json string to scenario object representation
-func (p *Parser) ParseScenarioFile(jsonString []byte) (*mj.Scenario, error) {
+func (p *Parser) ParseScenarioFile(jsonString []byte) (*scenmodel.Scenario, error) {
 	jobj, err := oj.ParseOrderedJSON(jsonString)
 	if err != nil {
 		return nil, err
@@ -20,10 +20,10 @@ func (p *Parser) ParseScenarioFile(jsonString []byte) (*mj.Scenario, error) {
 		return nil, errors.New("unmarshalled test top level object is not a map")
 	}
 
-	scenario := &mj.Scenario{
+	scenario := &scenmodel.Scenario{
 		CheckGas:    true,
 		TraceGas:    false,
-		GasSchedule: mj.GasScheduleDefault,
+		GasSchedule: scenmodel.GasScheduleDefault,
 	}
 
 	for _, kvp := range topMap.OrderedKV {
@@ -67,31 +67,31 @@ func (p *Parser) ParseScenarioFile(jsonString []byte) (*mj.Scenario, error) {
 	return scenario, nil
 }
 
-func (p *Parser) parseGasSchedule(value oj.OJsonObject) (mj.GasSchedule, error) {
+func (p *Parser) parseGasSchedule(value oj.OJsonObject) (scenmodel.GasSchedule, error) {
 	gasScheduleStr, err := p.parseString(value)
 	if err != nil {
-		return mj.GasScheduleDummy, fmt.Errorf("gasSchedule type not a string: %w", err)
+		return scenmodel.GasScheduleDummy, fmt.Errorf("gasSchedule type not a string: %w", err)
 	}
 	switch gasScheduleStr {
 	case "default":
-		return mj.GasScheduleDefault, nil
+		return scenmodel.GasScheduleDefault, nil
 	case "dummy":
-		return mj.GasScheduleDummy, nil
+		return scenmodel.GasScheduleDummy, nil
 	case "v3":
-		return mj.GasScheduleV3, nil
+		return scenmodel.GasScheduleV3, nil
 	case "v4":
-		return mj.GasScheduleV4, nil
+		return scenmodel.GasScheduleV4, nil
 	default:
-		return mj.GasScheduleDummy, fmt.Errorf("invalid gasSchedule: %s", gasScheduleStr)
+		return scenmodel.GasScheduleDummy, fmt.Errorf("invalid gasSchedule: %s", gasScheduleStr)
 	}
 }
 
-func (p *Parser) processScenarioStepList(obj interface{}) ([]mj.Step, error) {
+func (p *Parser) processScenarioStepList(obj interface{}) ([]scenmodel.Step, error) {
 	listRaw, listOk := obj.(*oj.OJsonList)
 	if !listOk {
 		return nil, errors.New("steps not a JSON list")
 	}
-	var stepList []mj.Step
+	var stepList []scenmodel.Step
 	for _, elemRaw := range listRaw.AsList() {
 		step, err := p.processScenarioStep(elemRaw)
 		if err != nil {
@@ -104,7 +104,7 @@ func (p *Parser) processScenarioStepList(obj interface{}) ([]mj.Step, error) {
 
 // ParseScenarioStep parses a single scenario step, instead of an entire file.
 // Handy for tests, where step snippets can be embedded in code.
-func (p *Parser) ParseScenarioStep(jsonSnippet string) (mj.Step, error) {
+func (p *Parser) ParseScenarioStep(jsonSnippet string) (scenmodel.Step, error) {
 	jobj, err := oj.ParseOrderedJSON([]byte(jsonSnippet))
 	if err != nil {
 		return nil, err
@@ -113,7 +113,7 @@ func (p *Parser) ParseScenarioStep(jsonSnippet string) (mj.Step, error) {
 	return p.processScenarioStep(jobj)
 }
 
-func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
+func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (scenmodel.Step, error) {
 	stepMap, isStepMap := stepObj.(*oj.OJsonMap)
 	if !isStepMap {
 		return nil, errors.New("unmarshalled step object is not a map")
@@ -133,9 +133,9 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 	switch stepTypeStr {
 	case "":
 		return nil, errors.New("no step type field provided")
-	case mj.StepNameExternalSteps:
-		traceGasStatus := mj.Undefined
-		step := &mj.ExternalStepsStep{TraceGas: traceGasStatus}
+	case scenmodel.StepNameExternalSteps:
+		traceGasStatus := scenmodel.Undefined
+		step := &scenmodel.ExternalStepsStep{TraceGas: traceGasStatus}
 		for _, kvp := range stepMap.OrderedKV {
 			switch kvp.Key {
 			case "step":
@@ -164,8 +164,8 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 			}
 		}
 		return step, nil
-	case mj.StepNameSetState:
-		step := &mj.SetStateStep{}
+	case scenmodel.StepNameSetState:
+		step := &scenmodel.SetStateStep{}
 		for _, kvp := range stepMap.OrderedKV {
 			switch kvp.Key {
 			case "step":
@@ -209,8 +209,8 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 			}
 		}
 		return step, nil
-	case mj.StepNameCheckState:
-		step := &mj.CheckStateStep{}
+	case scenmodel.StepNameCheckState:
+		step := &scenmodel.CheckStateStep{}
 		for _, kvp := range stepMap.OrderedKV {
 			switch kvp.Key {
 			case "step":
@@ -234,8 +234,8 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 			}
 		}
 		return step, nil
-	case mj.StepNameDumpState:
-		step := &mj.DumpStateStep{}
+	case scenmodel.StepNameDumpState:
+		step := &scenmodel.DumpStateStep{}
 		for _, kvp := range stepMap.OrderedKV {
 			switch kvp.Key {
 			case "step":
@@ -249,25 +249,25 @@ func (p *Parser) processScenarioStep(stepObj oj.OJsonObject) (mj.Step, error) {
 			}
 		}
 		return step, nil
-	case mj.StepNameScCall:
-		return p.parseTxStep(mj.ScCall, stepMap)
-	case mj.StepNameScDeploy:
-		return p.parseTxStep(mj.ScDeploy, stepMap)
-	case mj.StepNameScUpgrade:
-		return p.parseTxStep(mj.ScUpgrade, stepMap)
-	case mj.StepNameScQuery:
-		return p.parseTxStep(mj.ScQuery, stepMap)
-	case mj.StepNameTransfer:
-		return p.parseTxStep(mj.Transfer, stepMap)
-	case mj.StepNameValidatorReward:
-		return p.parseTxStep(mj.ValidatorReward, stepMap)
+	case scenmodel.StepNameScCall:
+		return p.parseTxStep(scenmodel.ScCall, stepMap)
+	case scenmodel.StepNameScDeploy:
+		return p.parseTxStep(scenmodel.ScDeploy, stepMap)
+	case scenmodel.StepNameScUpgrade:
+		return p.parseTxStep(scenmodel.ScUpgrade, stepMap)
+	case scenmodel.StepNameScQuery:
+		return p.parseTxStep(scenmodel.ScQuery, stepMap)
+	case scenmodel.StepNameTransfer:
+		return p.parseTxStep(scenmodel.Transfer, stepMap)
+	case scenmodel.StepNameValidatorReward:
+		return p.parseTxStep(scenmodel.ValidatorReward, stepMap)
 	default:
 		return nil, fmt.Errorf("unknown step type: %s", stepTypeStr)
 	}
 }
 
-func (p *Parser) parseTxStep(txType mj.TransactionType, stepMap *oj.OJsonMap) (*mj.TxStep, error) {
-	step := &mj.TxStep{}
+func (p *Parser) parseTxStep(txType scenmodel.TransactionType, stepMap *oj.OJsonMap) (*scenmodel.TxStep, error) {
+	step := &scenmodel.TxStep{}
 	var err error
 	for _, kvp := range stepMap.OrderedKV {
 		switch kvp.Key {

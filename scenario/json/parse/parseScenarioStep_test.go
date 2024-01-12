@@ -3,7 +3,7 @@ package scenjsonparse
 import (
 	"testing"
 
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/stretchr/testify/require"
 )
 
@@ -53,5 +53,5 @@ func TestParseScenario(t *testing.T) {
 	require.Nil(t, parseErr)
 	require.NotNil(t, step)
 	require.Equal(t, "scCall", step.StepTypeName())
-	require.Equal(t, true, step.(*mj.TxStep).DisplayLogs)
+	require.Equal(t, true, step.(*scenmodel.TxStep).DisplayLogs)
 }

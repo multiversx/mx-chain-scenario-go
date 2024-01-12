@@ -5,8 +5,8 @@ import (
 	logger "github.com/multiversx/mx-chain-logger-go"
 	fr "github.com/multiversx/mx-chain-scenario-go/scenario/expression/fileresolver"
 	er "github.com/multiversx/mx-chain-scenario-go/scenario/expression/reconstructor"
-	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
@@ -27,7 +27,7 @@ type ScenarioExecutor struct {
 	exprReconstructor er.ExprReconstructor
 }
 
-var _ mc.ScenarioRunner = (*ScenarioExecutor)(nil)
+var _ scenio.ScenarioRunner = (*ScenarioExecutor)(nil)
 
 // NewScenarioExecutor prepares a new VMTestExecutor instance.
 func NewScenarioExecutor(vmBuilder VMBuilder) *ScenarioExecutor {
@@ -46,7 +46,7 @@ func NewScenarioExecutor(vmBuilder VMBuilder) *ScenarioExecutor {
 
 // InitVM will initialize the VM and the builtin function container.
 // Does nothing if the VM is already initialized.
-func (ae *ScenarioExecutor) InitVM(scenGasSchedule mj.GasSchedule) error {
+func (ae *ScenarioExecutor) InitVM(scenGasSchedule scenmodel.GasSchedule) error {
 	if ae.vm != nil {
 		return nil
 	}

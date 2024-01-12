@@ -1,4 +1,4 @@
-package scencontroller
+package scenio
 
 import (
 	fr "github.com/multiversx/mx-chain-scenario-go/scenario/expression/fileresolver"

@@ -2,10 +2,10 @@ package scenjsonwrite
 
 import (
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func checkESDTDataToOJ(esdtItems []*mj.CheckESDTData, moreESDTTokensAllowed bool) *oj.OJsonMap {
+func checkESDTDataToOJ(esdtItems []*scenmodel.CheckESDTData, moreESDTTokensAllowed bool) *oj.OJsonMap {
 	esdtItemsOJ := oj.NewMap()
 	for _, esdtItem := range esdtItems {
 		esdtItemsOJ.Put(esdtItem.TokenIdentifier.Original, checkESDTItemToOJ(esdtItem))
@@ -16,7 +16,7 @@ func checkESDTDataToOJ(esdtItems []*mj.CheckESDTData, moreESDTTokensAllowed bool
 	return esdtItemsOJ
 }
 
-func checkESDTItemToOJ(esdtItem *mj.CheckESDTData) oj.OJsonObject {
+func checkESDTItemToOJ(esdtItem *scenmodel.CheckESDTData) oj.OJsonObject {
 	if isCompactCheckESDT(esdtItem) {
 		return checkBigIntToOJ(esdtItem.Instances[0].Balance)
 	}
@@ -55,7 +55,7 @@ func checkESDTItemToOJ(esdtItem *mj.CheckESDTData) oj.OJsonObject {
 	return esdtItemOJ
 }
 
-func appendCheckESDTInstanceToOJ(esdtInstance *mj.CheckESDTInstance, targetOj *oj.OJsonMap) {
+func appendCheckESDTInstanceToOJ(esdtInstance *scenmodel.CheckESDTInstance, targetOj *oj.OJsonMap) {
 	targetOj.Put("nonce", uint64ToOJ(esdtInstance.Nonce))
 
 	if len(esdtInstance.Balance.Original) > 0 {
@@ -78,7 +78,7 @@ func appendCheckESDTInstanceToOJ(esdtInstance *mj.CheckESDTInstance, targetOj *o
 	}
 }
 
-func isCompactCheckESDT(esdtItem *mj.CheckESDTData) bool {
+func isCompactCheckESDT(esdtItem *scenmodel.CheckESDTData) bool {
 	if len(esdtItem.Instances) != 1 {
 		return false
 	}

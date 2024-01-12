@@ -5,18 +5,18 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*mj.Transaction, error) {
+func (p *Parser) processTx(txType scenmodel.TransactionType, blrRaw oj.OJsonObject) (*scenmodel.Transaction, error) {
 	bltMap, isMap := blrRaw.(*oj.OJsonMap)
 	if !isMap {
 		return nil, errors.New("unmarshalled transaction is not a map")
 	}
 
-	blt := mj.Transaction{
+	blt := scenmodel.Transaction{
 		Type:      txType,
-		EGLDValue: mj.JSONBigIntZero(),
+		EGLDValue: scenmodel.JSONBigIntZero(),
 		ESDTValue: nil,
 	}
 
@@ -48,7 +48,7 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 				return nil, fmt.Errorf("invalid transaction to: %w", err)
 			}
 
-			if txType == mj.ScDeploy {
+			if txType == scenmodel.ScDeploy {
 				if len(toStr) > 0 {
 					return nil, errors.New("transaction to field not allowed for scDeploy transactions")
 				}
@@ -93,7 +93,7 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 			if err != nil {
 				return nil, fmt.Errorf("invalid transaction arguments: %w", err)
 			}
-			if txType == mj.Transfer && len(blt.Arguments) > 0 {
+			if txType == scenmodel.Transfer && len(blt.Arguments) > 0 {
 				return nil, errors.New("function arguments not allowed for transfer transactions")
 			}
 		case "contractCode":
@@ -101,7 +101,7 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 			if err != nil {
 				return nil, fmt.Errorf("invalid transaction contract code: %w", err)
 			}
-			if txType != mj.ScDeploy && txType != mj.ScUpgrade && len(blt.Code.Value) > 0 {
+			if txType != scenmodel.ScDeploy && txType != scenmodel.ScUpgrade && len(blt.Code.Value) > 0 {
 				return nil, errors.New("transaction contractCode field only allowed in scDeploy or scUpgrade transactions")
 			}
 		case "codeMetadata":
@@ -109,7 +109,7 @@ func (p *Parser) processTx(txType mj.TransactionType, blrRaw oj.OJsonObject) (*m
 			if err != nil {
 				return nil, fmt.Errorf("invalid transaction contract codeMetadata: %w", err)
 			}
-			if txType != mj.ScDeploy && txType != mj.ScUpgrade && len(blt.CodeMetadata.Value) > 0 {
+			if txType != scenmodel.ScDeploy && txType != scenmodel.ScUpgrade && len(blt.CodeMetadata.Value) > 0 {
 				return nil, errors.New("transaction codeMetadata field only allowed in scDeploy or scUpgrade transactions")
 			}
 		case "gasLimit":

@@ -1,4 +1,4 @@
-package scencontroller
+package scenio
 
 import (
 	"errors"

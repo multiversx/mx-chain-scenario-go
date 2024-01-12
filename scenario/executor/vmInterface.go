@@ -1,7 +1,7 @@
 package scenexec
 
 import (
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
@@ -25,7 +25,7 @@ type VMBuilder interface {
 	NewMockWorld() *worldmock.MockWorld
 
 	// GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
-	GasScheduleMapFromScenarios(scenGasSchedule mj.GasSchedule) (worldmock.GasScheduleMap, error)
+	GasScheduleMapFromScenarios(scenGasSchedule scenmodel.GasSchedule) (worldmock.GasScheduleMap, error)
 
 	// NewVM creates the execution VM host with references to the world mock and gas schedule.
 	NewVM(world *worldmock.MockWorld, gasSchedule map[string]map[string]uint64) (VMInterface, error)

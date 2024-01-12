@@ -1,4 +1,4 @@
-package scenjsonmodel
+package scenmodel
 
 // TransactionType describes the type of simulate transaction
 type TransactionType int

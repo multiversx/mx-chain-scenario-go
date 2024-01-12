@@ -5,21 +5,21 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processTxExpectedResult(blrRaw oj.OJsonObject) (*mj.TransactionResult, error) {
+func (p *Parser) processTxExpectedResult(blrRaw oj.OJsonObject) (*scenmodel.TransactionResult, error) {
 	blrMap, isMap := blrRaw.(*oj.OJsonMap)
 	if !isMap {
 		return nil, errors.New("unmarshalled block result is not a map")
 	}
 
-	blr := mj.TransactionResult{
-		Status:  mj.JSONCheckBigIntUnspecified(),
-		Message: mj.JSONCheckBytesUnspecified(),
-		Gas:     mj.JSONCheckUint64Unspecified(),
-		Refund:  mj.JSONCheckBigIntUnspecified(),
-		Logs:    mj.LogList{IsUnspecified: true, IsStar: true},
+	blr := scenmodel.TransactionResult{
+		Status:  scenmodel.JSONCheckBigIntUnspecified(),
+		Message: scenmodel.JSONCheckBytesUnspecified(),
+		Gas:     scenmodel.JSONCheckUint64Unspecified(),
+		Refund:  scenmodel.JSONCheckBigIntUnspecified(),
+		Logs:    scenmodel.LogList{IsUnspecified: true, IsStar: true},
 	}
 	var err error
 	for _, kvp := range blrMap.OrderedKV {

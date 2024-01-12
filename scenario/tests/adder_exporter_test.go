@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	exporter "github.com/multiversx/mx-chain-scenario-go/scenario/exporter"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-scenario-go/util"
 
 	"github.com/stretchr/testify/require"
@@ -41,7 +41,7 @@ func TestGetAccountsAndTransactionsFrom_Adder(t *testing.T) {
 	expectedAccs = append(expectedAccs, ownerAccount, scAccount)
 	expectedDeployedAccs = append(expectedDeployedAccs, deployedScAccount)
 
-	transaction := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*mj.ESDTTxData, 0), sbi.Accs[0].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
+	transaction := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*scenmodel.ESDTTxData, 0), sbi.Accs[0].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
 	expectedTxs = append(expectedTxs, transaction, transaction)
 
 	require.Nil(t, err)
@@ -67,9 +67,9 @@ func TestGetAccountsAndTransactionsFrom_AdderWithExternalSteps(t *testing.T) {
 	expectedAccs = append(expectedAccs, aliceAccount, scAccount, bobAccount, ownerAccount)
 	require.Equal(t, expectedAccs, sbi.Accs)
 
-	transactionAlice := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*mj.ESDTTxData, 0), sbi.Accs[0].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
-	transactionBob := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*mj.ESDTTxData, 0), sbi.Accs[2].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
-	transactionOwner := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*mj.ESDTTxData, 0), sbi.Accs[3].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
+	transactionAlice := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*scenmodel.ESDTTxData, 0), sbi.Accs[0].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
+	transactionBob := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*scenmodel.ESDTTxData, 0), sbi.Accs[2].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
+	transactionOwner := exporter.CreateTransaction("add", [][]byte{{3}}, 0, big.NewInt(0), make([]*scenmodel.ESDTTxData, 0), sbi.Accs[3].GetAddress(), sbi.Accs[1].GetAddress(), 5000000, 1)
 	expectedTxs = append(expectedTxs, transactionBob, transactionAlice, transactionOwner)
 	require.Equal(t, expectedBenchmarkTxPos, sbi.BenchmarkTxPos)
 	require.Equal(t, expectedTxs, sbi.Txs)

@@ -1,7 +1,7 @@
-package scencontroller
+package scenio
 
 import (
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
 // RunScenarioOptions defines the scenario options component
@@ -9,7 +9,7 @@ type RunScenarioOptions struct {
 	ForceTraceGas bool
 }
 
-func applyScenarioOptions(scenario *mj.Scenario, options *RunScenarioOptions) {
+func applyScenarioOptions(scenario *scenmodel.Scenario, options *RunScenarioOptions) {
 	if options.ForceTraceGas {
 		scenario.TraceGas = true
 	}

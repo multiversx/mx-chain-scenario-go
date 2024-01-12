@@ -5,15 +5,15 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processBlockInfo(blockInfoRaw oj.OJsonObject) (*mj.BlockInfo, error) {
+func (p *Parser) processBlockInfo(blockInfoRaw oj.OJsonObject) (*scenmodel.BlockInfo, error) {
 	blockMap, isMap := blockInfoRaw.(*oj.OJsonMap)
 	if !isMap {
 		return nil, errors.New("unmarshalled block info object is not a map")
 	}
-	blockInfo := &mj.BlockInfo{}
+	blockInfo := &scenmodel.BlockInfo{}
 	var err error
 
 	for _, kvp := range blockMap.OrderedKV {

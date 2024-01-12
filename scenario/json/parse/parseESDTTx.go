@@ -5,11 +5,11 @@ import (
 	"fmt"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
-func (p *Parser) processTxESDT(txEsdtRaw oj.OJsonObject) ([]*mj.ESDTTxData, error) {
-	allEsdtData := make([]*mj.ESDTTxData, 0)
+func (p *Parser) processTxESDT(txEsdtRaw oj.OJsonObject) ([]*scenmodel.ESDTTxData, error) {
+	allEsdtData := make([]*scenmodel.ESDTTxData, 0)
 
 	switch txEsdt := txEsdtRaw.(type) {
 	case *oj.OJsonMap:
@@ -43,8 +43,8 @@ func (p *Parser) processTxESDT(txEsdtRaw oj.OJsonObject) ([]*mj.ESDTTxData, erro
 	return allEsdtData, nil
 }
 
-func (p *Parser) parseSingleTxEsdtEntry(esdtTxEntry *oj.OJsonMap) (*mj.ESDTTxData, error) {
-	esdtData := mj.ESDTTxData{}
+func (p *Parser) parseSingleTxEsdtEntry(esdtTxEntry *oj.OJsonMap) (*scenmodel.ESDTTxData, error) {
+	esdtData := scenmodel.ESDTTxData{}
 	var err error
 
 	for _, kvp := range esdtTxEntry.OrderedKV {

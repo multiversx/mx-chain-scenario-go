@@ -6,15 +6,15 @@ import (
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
 	er "github.com/multiversx/mx-chain-scenario-go/scenario/expression/reconstructor"
-	mjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
 func (ae *ScenarioExecutor) checkTxResults(
 	txIndex string,
-	blResult *mj.TransactionResult,
+	blResult *scenmodel.TransactionResult,
 	checkGas bool,
 	output *vmcommon.VMOutput,
 ) error {
@@ -58,7 +58,7 @@ func (ae *ScenarioExecutor) checkTxResults(
 
 func (ae *ScenarioExecutor) checkTxLogs(
 	txIndex string,
-	expectedLogs mj.LogList,
+	expectedLogs scenmodel.LogList,
 	actualLogs []*vmcommon.LogEntry,
 ) error {
 	// "logs": "*" means any value is accepted, log check ignored
@@ -85,7 +85,7 @@ func (ae *ScenarioExecutor) checkTxLogs(
 			return fmt.Errorf("unexpected log. Tx '%s'. Log index: %d. Log:\n%s",
 				txIndex,
 				i,
-				mjwrite.LogToString(ae.convertLogToTestFormat(actualLog)),
+				scenjwrite.LogToString(ae.convertLogToTestFormat(actualLog)),
 			)
 		}
 	}
@@ -96,21 +96,21 @@ func (ae *ScenarioExecutor) checkTxLogs(
 func (ae *ScenarioExecutor) checkTxLog(
 	txIndex string,
 	logIndex int,
-	expectedLog *mj.LogEntry,
+	expectedLog *scenmodel.LogEntry,
 	actualLog *vmcommon.LogEntry) error {
 	if !expectedLog.Address.Check(actualLog.Address) {
 		return fmt.Errorf("bad log address. Tx '%s'. Log index: %d. Want:\n%s\nGot:\n%s",
 			txIndex,
 			logIndex,
-			mjwrite.LogToString(expectedLog),
-			mjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
+			scenjwrite.LogToString(expectedLog),
+			scenjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
 	}
 	if !expectedLog.Endpoint.Check(actualLog.Identifier) {
 		return fmt.Errorf("bad log identifier. Tx '%s'. Log index: %d. Want:\n%s\nGot:\n%s",
 			txIndex,
 			logIndex,
-			mjwrite.LogToString(expectedLog),
-			mjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
+			scenjwrite.LogToString(expectedLog),
+			scenjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
 	}
 	if !expectedLog.Topics.CheckList(actualLog.Topics) {
 		return fmt.Errorf("bad log topics. Tx '%s'. Log index: %d. Want: %s. Have: %s",
@@ -123,15 +123,15 @@ func (ae *ScenarioExecutor) checkTxLog(
 		return fmt.Errorf("bad log data. Tx '%s'. Log index: %d. Want:\n%s\nGot:\n%s",
 			txIndex,
 			logIndex,
-			mjwrite.LogToString(expectedLog),
-			mjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
+			scenjwrite.LogToString(expectedLog),
+			scenjwrite.LogToString(ae.convertLogToTestFormat(actualLog)))
 	}
 	return nil
 }
 
 // JSONCheckBytesString formats a list of JSONCheckBytes for printing to console.
 // TODO: move somewhere else
-func checkBytesListPretty(jcbl mj.JSONCheckValueList) string {
+func checkBytesListPretty(jcbl scenmodel.JSONCheckValueList) string {
 	str := "["
 	for i, jcb := range jcbl.Values {
 		if i > 0 {

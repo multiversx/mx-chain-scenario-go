@@ -1,4 +1,4 @@
-package scenjsonmodel
+package scenmodel
 
 import "bytes"
 

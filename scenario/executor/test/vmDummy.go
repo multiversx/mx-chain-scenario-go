@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	scenarioexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 
 	"github.com/multiversx/mx-chain-core-go/core"
@@ -68,7 +68,7 @@ func (*DummyVMBuilder) NewMockWorld() *worldmock.MockWorld {
 }
 
 // GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
-func (*DummyVMBuilder) GasScheduleMapFromScenarios(scenGasSchedule mj.GasSchedule) (worldmock.GasScheduleMap, error) {
+func (*DummyVMBuilder) GasScheduleMapFromScenarios(scenGasSchedule scenmodel.GasSchedule) (worldmock.GasScheduleMap, error) {
 	gasMap := make(map[string]map[string]uint64)
 	fillGasMapInternal(gasMap, 1)
 	return gasMap, nil

@@ -1,4 +1,4 @@
-package scenjsonmodel
+package scenmodel
 
 // Scenario is a json object representing a test scenario with steps.
 type Scenario struct {

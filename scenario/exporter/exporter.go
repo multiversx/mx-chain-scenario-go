@@ -4,8 +4,8 @@ import (
 	"errors"
 	"math/big"
 
-	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 )
 
@@ -62,15 +62,15 @@ func GetAccountsAndTransactionsFromScenarios(testPath string) (stateAndBenchmark
 	return stateAndBenchmarkInfo, nil
 }
 
-func getScenario(testPath string) (scenario *mj.Scenario, err error) {
-	scenario, err = mc.ParseScenariosScenarioDefaultParser(testPath)
+func getScenario(testPath string) (scenario *scenmodel.Scenario, err error) {
+	scenario, err = scenio.ParseScenariosScenarioDefaultParser(testPath)
 	if err != nil {
 		return nil, err
 	}
 	return scenario, err
 }
 
-func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo ScenarioWithBenchmark, err error) {
+func getAccountsAndTransactionsFromSteps(steps []scenmodel.Step) (stateAndBenchmarkInfo ScenarioWithBenchmark, err error) {
 	stateAndBenchmarkInfo.BenchmarkTxPos = InvalidBenchmarkTxPos
 
 	if len(steps) == 0 {
@@ -87,7 +87,7 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 
 	for i := 0; i < len(steps); i++ {
 		switch step := steps[i].(type) {
-		case *mj.SetStateStep:
+		case *scenmodel.SetStateStep:
 			setStepAccounts, setStepDeployedAccounts, err := getAccountsFromSetStateStep(step)
 			if err != nil {
 				return getInvalidScenarioWithBenchmark(), err
@@ -95,7 +95,7 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 			stateAndBenchmarkInfo.Accs = append(stateAndBenchmarkInfo.Accs, setStepAccounts...)
 			stateAndBenchmarkInfo.DeployedAccs = append(stateAndBenchmarkInfo.DeployedAccs, setStepDeployedAccounts...)
 
-		case *mj.TxStep:
+		case *scenmodel.TxStep:
 			if step.ExpectedResult.Status.Value.Cmp(okStatus) == 0 {
 
 				if step.Tx.GasPrice.Value == 0 {
@@ -146,7 +146,7 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 					i--
 				}
 			}
-		case *mj.ExternalStepsStep:
+		case *scenmodel.ExternalStepsStep:
 			externalStateAndBenchmarkInfo, err := GetAccountsAndTransactionsFromScenarios(step.Path)
 			if err != nil {
 				return getInvalidScenarioWithBenchmark(), err
@@ -166,7 +166,7 @@ func getAccountsAndTransactionsFromSteps(steps []mj.Step) (stateAndBenchmarkInfo
 	return stateAndBenchmarkInfo, nil
 }
 
-func getAccountsFromSetStateStep(setStateStep *mj.SetStateStep) (accounts []*TestAccount, deployedAccounts []*TestAccount, err error) {
+func getAccountsFromSetStateStep(setStateStep *scenmodel.SetStateStep) (accounts []*TestAccount, deployedAccounts []*TestAccount, err error) {
 	accounts = make([]*TestAccount, 0)
 	deployedAccounts = make([]*TestAccount, 0)
 	for _, scenAccount := range setStateStep.Accounts {
@@ -189,7 +189,7 @@ func getAccountsFromSetStateStep(setStateStep *mj.SetStateStep) (accounts []*Tes
 	return accounts, deployedAccounts, nil
 }
 
-func convertScenariosAccountToTestAccount(scenAcc *mj.Account) (*TestAccount, error) {
+func convertScenariosAccountToTestAccount(scenAcc *scenmodel.Account) (*TestAccount, error) {
 	if len(scenAcc.Address.Value) != 32 {
 		return nil, errors.New("bad test: account address should be 32 bytes long")
 	}
@@ -208,7 +208,7 @@ func convertScenariosAccountToTestAccount(scenAcc *mj.Account) (*TestAccount, er
 	return account, nil
 }
 
-func getArguments(args []mj.JSONBytesFromTree) [][]byte {
+func getArguments(args []scenmodel.JSONBytesFromTree) [][]byte {
 	arguments := make([][]byte, len(args))
 	for i := 0; i < len(args); i++ {
 		arguments[i] = append(arguments[i], args[i].Value...)
@@ -216,11 +216,11 @@ func getArguments(args []mj.JSONBytesFromTree) [][]byte {
 	return arguments
 }
 
-func stepIsSetState(step mj.Step) bool {
+func stepIsSetState(step scenmodel.Step) bool {
 	return step.StepTypeName() == "setState"
 }
 
-func stepIsExternalStep(step mj.Step) bool {
+func stepIsExternalStep(step scenmodel.Step) bool {
 	return step.StepTypeName() == "externalSteps"
 }
 

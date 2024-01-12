@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	mc "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
 
 	cli "github.com/urfave/cli/v2"
 )
@@ -48,7 +48,7 @@ func ScenariosCLI(version string, vmFlags CLIRunConfig) {
 					return errors.New("one path argument required to format scenarios")
 				}
 				path := cCtx.Args().First()
-				err := mc.FormatAllInFolder(path)
+				err := scenio.FormatAllInFolder(path)
 				return err
 			},
 		},

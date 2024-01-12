@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	fr "github.com/multiversx/mx-chain-scenario-go/scenario/expression/fileresolver"
-	mjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
-	mjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
+	scenjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
+	scenjwrite "github.com/multiversx/mx-chain-scenario-go/scenario/json/write"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -33,7 +34,7 @@ func TestWriteScenario(t *testing.T) {
 	contents, err := loadExampleFile("example.scen.json")
 	require.Nil(t, err)
 
-	p := mjparse.NewParser(
+	p := scenjparse.NewParser(
 		fr.NewDefaultFileResolver().ReplacePath(
 			"smart-contract.wasm",
 			"exampleFile.txt"))
@@ -41,7 +42,7 @@ func TestWriteScenario(t *testing.T) {
 	scenario, parseErr := p.ParseScenarioFile(contents)
 	require.Nil(t, parseErr)
 
-	serialized := mjwrite.ScenarioToJSONString(scenario)
+	serialized := scenjwrite.ScenarioToJSONString(scenario)
 
 	// good for debugging:
 	_ = os.WriteFile("serialized.scen.json", []byte(serialized), 0644)

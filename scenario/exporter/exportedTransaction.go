@@ -3,7 +3,7 @@ package exporter
 import (
 	"math/big"
 
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-scenario-go/util"
 	txDataBuilder "github.com/multiversx/mx-chain-vm-common-go/txDataBuilder"
 )
@@ -22,7 +22,7 @@ type Transaction struct {
 	deployData []byte
 	nonce      uint64
 	value      *big.Int
-	esdtValue  []*mj.ESDTTxData
+	esdtValue  []*scenmodel.ESDTTxData
 	sndAddr    []byte
 	rcvAddr    []byte
 	gasPrice   uint64
@@ -34,7 +34,7 @@ func NewTransaction() *Transaction {
 	return &Transaction{
 		args:       make([][]byte, 0),
 		value:      big.NewInt(0),
-		esdtValue:  make([]*mj.ESDTTxData, 0),
+		esdtValue:  make([]*scenmodel.ESDTTxData, 0),
 		sndAddr:    make([]byte, 0),
 		rcvAddr:    make([]byte, 0),
 		deployData: make([]byte, 0),
@@ -64,13 +64,13 @@ func (tx *Transaction) GetCallValue() *big.Int {
 }
 
 // WithESDTTransfers sets the ESDT transafers
-func (tx *Transaction) WithESDTTransfers(esdtTransfers []*mj.ESDTTxData) *Transaction {
+func (tx *Transaction) WithESDTTransfers(esdtTransfers []*scenmodel.ESDTTxData) *Transaction {
 	tx.esdtValue = append(tx.esdtValue, esdtTransfers...)
 	return tx
 }
 
 // GetESDTTransfers gets the ESDT transfers
-func (tx *Transaction) GetESDTTransfers() []*mj.ESDTTxData {
+func (tx *Transaction) GetESDTTransfers() []*scenmodel.ESDTTxData {
 	return tx.esdtValue
 }
 
@@ -163,7 +163,7 @@ func CreateTransaction(
 	args [][]byte,
 	nonce uint64,
 	value *big.Int,
-	esdtTransfers []*mj.ESDTTxData,
+	esdtTransfers []*scenmodel.ESDTTxData,
 	sndAddr []byte,
 	rcvAddr []byte,
 	gasLimit uint64,

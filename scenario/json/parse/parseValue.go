@@ -5,7 +5,7 @@ import (
 	"math/big"
 
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
-	mj "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	twos "github.com/multiversx/mx-components-big-int/twos-complement"
 )
 
@@ -16,10 +16,10 @@ const (
 	bigIntUnsignedBytes
 )
 
-func (p *Parser) processCheckBigInt(obj oj.OJsonObject, format bigIntParseFormat) (mj.JSONCheckBigInt, error) {
+func (p *Parser) processCheckBigInt(obj oj.OJsonObject, format bigIntParseFormat) (scenmodel.JSONCheckBigInt, error) {
 	if IsStar(obj) {
 		// "*" means any value, skip checking it
-		return mj.JSONCheckBigInt{
+		return scenmodel.JSONCheckBigInt{
 			Value:    nil,
 			IsStar:   true,
 			Original: "*"}, nil
@@ -27,23 +27,23 @@ func (p *Parser) processCheckBigInt(obj oj.OJsonObject, format bigIntParseFormat
 
 	jbi, err := p.processBigInt(obj, format)
 	if err != nil {
-		return mj.JSONCheckBigInt{}, err
+		return scenmodel.JSONCheckBigInt{}, err
 	}
-	return mj.JSONCheckBigInt{
+	return scenmodel.JSONCheckBigInt{
 		Value:    jbi.Value,
 		IsStar:   false,
 		Original: jbi.Original,
 	}, nil
 }
 
-func (p *Parser) processBigInt(obj oj.OJsonObject, format bigIntParseFormat) (mj.JSONBigInt, error) {
+func (p *Parser) processBigInt(obj oj.OJsonObject, format bigIntParseFormat) (scenmodel.JSONBigInt, error) {
 	strVal, err := p.parseString(obj)
 	if err != nil {
-		return mj.JSONBigInt{}, err
+		return scenmodel.JSONBigInt{}, err
 	}
 
 	bi, err := p.parseBigInt(strVal, format)
-	return mj.JSONBigInt{
+	return scenmodel.JSONBigInt{
 		Value:    bi,
 		Original: strVal,
 	}, err
@@ -64,10 +64,10 @@ func (p *Parser) parseBigInt(strRaw string, format bigIntParseFormat) (*big.Int,
 	}
 }
 
-func (p *Parser) processCheckUint64(obj oj.OJsonObject) (mj.JSONCheckUint64, error) {
+func (p *Parser) processCheckUint64(obj oj.OJsonObject) (scenmodel.JSONCheckUint64, error) {
 	if IsStar(obj) {
 		// "*" means any value, skip checking it
-		return mj.JSONCheckUint64{
+		return scenmodel.JSONCheckUint64{
 			Value:    0,
 			IsStar:   true,
 			Original: "*"}, nil
@@ -75,59 +75,59 @@ func (p *Parser) processCheckUint64(obj oj.OJsonObject) (mj.JSONCheckUint64, err
 
 	ju, err := p.processUint64(obj)
 	if err != nil {
-		return mj.JSONCheckUint64{}, err
+		return scenmodel.JSONCheckUint64{}, err
 	}
-	return mj.JSONCheckUint64{
+	return scenmodel.JSONCheckUint64{
 		Value:    ju.Value,
 		IsStar:   false,
 		Original: ju.Original}, nil
 
 }
 
-func (p *Parser) processUint64(obj oj.OJsonObject) (mj.JSONUint64, error) {
+func (p *Parser) processUint64(obj oj.OJsonObject) (scenmodel.JSONUint64, error) {
 	bi, err := p.processBigInt(obj, bigIntUnsignedBytes)
 	if err != nil {
-		return mj.JSONUint64{}, err
+		return scenmodel.JSONUint64{}, err
 	}
 
 	if bi.Value == nil || !bi.Value.IsUint64() {
-		return mj.JSONUint64{}, errors.New("value is not uint64")
+		return scenmodel.JSONUint64{}, errors.New("value is not uint64")
 	}
 
-	return mj.JSONUint64{
+	return scenmodel.JSONUint64{
 		Value:    bi.Value.Uint64(),
 		Original: bi.Original}, nil
 }
 
-func (p *Parser) parseCheckBytes(obj oj.OJsonObject) (mj.JSONCheckBytes, error) {
+func (p *Parser) parseCheckBytes(obj oj.OJsonObject) (scenmodel.JSONCheckBytes, error) {
 	if IsStar(obj) {
 		// "*" means any value, skip checking it
-		return mj.JSONCheckBytesStar(), nil
+		return scenmodel.JSONCheckBytesStar(), nil
 	}
 
 	jb, err := p.processSubTreeAsByteArray(obj)
 	if err != nil {
-		return mj.JSONCheckBytes{}, err
+		return scenmodel.JSONCheckBytes{}, err
 	}
-	return mj.JSONCheckBytes{
+	return scenmodel.JSONCheckBytes{
 		Value:    jb.Value,
 		IsStar:   false,
 		Original: jb.Original,
 	}, nil
 }
 
-func (p *Parser) processStringAsByteArray(obj oj.OJsonObject) (mj.JSONBytesFromString, error) {
+func (p *Parser) processStringAsByteArray(obj oj.OJsonObject) (scenmodel.JSONBytesFromString, error) {
 	strVal, err := p.parseString(obj)
 	if err != nil {
-		return mj.JSONBytesFromString{}, err
+		return scenmodel.JSONBytesFromString{}, err
 	}
 	result, err := p.ExprInterpreter.InterpretString(strVal)
-	return mj.NewJSONBytesFromString(result, strVal), err
+	return scenmodel.NewJSONBytesFromString(result, strVal), err
 }
 
-func (p *Parser) processSubTreeAsByteArray(obj oj.OJsonObject) (mj.JSONBytesFromTree, error) {
+func (p *Parser) processSubTreeAsByteArray(obj oj.OJsonObject) (scenmodel.JSONBytesFromTree, error) {
 	value, err := p.ExprInterpreter.InterpretSubTree(obj)
-	return mj.JSONBytesFromTree{
+	return scenmodel.JSONBytesFromTree{
 		Value:    value,
 		Original: obj,
 	}, err
