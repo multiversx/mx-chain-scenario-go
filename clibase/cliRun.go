@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	mc "github.com/multiversx/mx-chain-scenario-go/controller"
-	scenexec "github.com/multiversx/mx-chain-scenario-go/executor"
+	scenexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
 )
 
 // RunScenariosAtPath runs either;
@@ -23,9 +23,9 @@ func RunScenariosAtPath(path string, options CLIRunOptions) error {
 
 	switch {
 	case fi.IsDir():
-		runner := mc.NewScenarioController(
+		runner := scenio.NewScenarioController(
 			executor,
-			mc.NewDefaultFileResolver(),
+			scenio.NewDefaultFileResolver(),
 		)
 		err = runner.RunAllJSONScenariosInDirectory(
 			path,
@@ -34,9 +34,9 @@ func RunScenariosAtPath(path string, options CLIRunOptions) error {
 			[]string{},
 			options.RunOptions)
 	case strings.HasSuffix(path, ".scen.json"):
-		runner := mc.NewScenarioController(
+		runner := scenio.NewScenarioController(
 			executor,
-			mc.NewDefaultFileResolver(),
+			scenio.NewDefaultFileResolver(),
 		)
 		err = runner.RunSingleJSONScenario(path, options.RunOptions)
 	default:

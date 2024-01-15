@@ -8,8 +8,8 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/esdt"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
-	"github.com/multiversx/mx-chain-scenario-go/esdtconvert"
-	mj "github.com/multiversx/mx-chain-scenario-go/model"
+	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
@@ -109,7 +109,7 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 	sender []byte,
 	receiver []byte,
-	esdtTransfers []*mj.ESDTTxData,
+	esdtTransfers []*scenmodel.ESDTTxData,
 	callType vm.CallType,
 	gasLimit uint64,
 	gasPrice uint64,

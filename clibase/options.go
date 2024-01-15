@@ -1,14 +1,15 @@
 package scenclibase
 
 import (
-	mc "github.com/multiversx/mx-chain-scenario-go/controller"
-	scenexec "github.com/multiversx/mx-chain-scenario-go/executor"
+	scenexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
+	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+
 	cli "github.com/urfave/cli/v2"
 )
 
 // CLIRunOptions are all the options needed to run scenarios in a directory.
 type CLIRunOptions struct {
-	RunOptions *mc.RunScenarioOptions
+	RunOptions *scenio.RunScenarioOptions
 	VMBuilder  scenexec.VMBuilder
 }
 
