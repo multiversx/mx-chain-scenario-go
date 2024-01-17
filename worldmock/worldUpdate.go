@@ -82,12 +82,8 @@ func (b *MockWorld) UpdateAccountFromOutputAccount(modAcct *vmcommon.OutputAccou
 		acct.Nonce = modAcct.Nonce
 	}
 	if len(modAcct.Code) > 0 {
-		// TODO: set CodeMetadata according to code metdata coming from VM
-		acct.SetCodeAndMetadata(modAcct.Code, &vmcommon.CodeMetadata{
-			Payable:     true,
-			Upgradeable: true,
-			Readable:    true,
-		})
+		codeMetadata := vmcommon.CodeMetadataFromBytes(modAcct.CodeMetadata)
+		acct.SetCodeAndMetadata(modAcct.Code, &codeMetadata)
 	}
 	if len(modAcct.OutputTransfers) > 0 && len(modAcct.OutputTransfers[0].Data) > 0 {
 		acct.AsyncCallData = string(modAcct.OutputTransfers[0].Data)
