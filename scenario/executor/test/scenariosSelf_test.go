@@ -120,7 +120,7 @@ func TestScenariosCheckCodeMetadataErr(t *testing.T) {
 		File("set-check-codemetadata.err.json").
 		Run().
 		RequireError(
-			"Check state \"check-1\": bad account code metadata. Account: sc:contract-address. Want: \"0x0000\". Have: \"0x0101\"")
+			"Check state \"check-1\": bad account code metadata. Account: sc:contract-address. Want: \"0x0000\". Have: \"0x0102\"")
 }
 
 func TestScenariosCheckStorageErr1(t *testing.T) {
