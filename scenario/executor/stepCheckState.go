@@ -2,6 +2,7 @@ package scenexec
 
 import (
 	"bytes"
+	"encoding/hex"
 	"fmt"
 	"math/big"
 	"strings"
@@ -388,13 +389,14 @@ func (ae *ScenarioExecutor) checkTokenInstances(
 		if !expectedInstance.Attributes.IsUnspecified() &&
 			!expectedInstance.Attributes.Check(accountInstance.TokenMetaData.Attributes) {
 			errors = append(errors, fmt.Errorf(
-				"for token: %s, nonce: %d: Bad attributes. Want: %s. Have: \"%s\"",
+				"for token: %s, nonce: %d: Bad attributes. Want: \"0x%s (%s)\". Have: \"%s\"",
 				tokenName,
 				nonce,
+				hex.EncodeToString(jsonToBytes(expectedInstance.Attributes.Original)),
 				objectStringOrDefault(expectedInstance.Attributes.Original),
 				ae.exprReconstructor.Reconstruct(
 					accountInstance.TokenMetaData.Attributes,
-					er.StrHint)))
+					er.NoHint)))
 		}
 
 	}
@@ -454,4 +456,8 @@ func objectStringOrDefault(obj oj.OJsonObject) string {
 	}
 
 	return oj.JSONString(obj)
+}
+
+func jsonToBytes(obj oj.OJsonObject) []byte {
+	return []byte(objectStringOrDefault(obj))
 }
