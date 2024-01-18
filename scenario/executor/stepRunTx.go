@@ -235,9 +235,13 @@ func (ae *ScenarioExecutor) scCreate(txIndex string, tx *scenmodel.Transaction, 
 		ESDTTransfers:  make([]*vmcommon.ESDTTransfer, 0),
 	}
 	addESDTToVMInput(tx.ESDTValue, &vmInput)
+	codeMetadata := tx.CodeMetadata.Value
+	if tx.CodeMetadata.Unspecified {
+		codeMetadata = DefaultCodeMetadata
+	}
 	input := &vmcommon.ContractCreateInput{
 		ContractCode:         tx.Code.Value,
-		ContractCodeMetadata: tx.CodeMetadata.Value,
+		ContractCodeMetadata: codeMetadata,
 		VMInput:              vmInput,
 	}
 

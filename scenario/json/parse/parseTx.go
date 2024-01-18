@@ -15,9 +15,16 @@ func (p *Parser) processTx(txType scenmodel.TransactionType, blrRaw oj.OJsonObje
 	}
 
 	blt := scenmodel.Transaction{
-		Type:      txType,
-		EGLDValue: scenmodel.JSONBigIntZero(),
-		ESDTValue: nil,
+		Type:         txType,
+		Nonce:        scenmodel.JSONUint64Zero(),
+		EGLDValue:    scenmodel.JSONBigIntZero(),
+		ESDTValue:    nil,
+		From:         scenmodel.JSONBytesEmpty(),
+		To:           scenmodel.JSONBytesEmpty(),
+		Code:         scenmodel.JSONBytesEmpty(),
+		CodeMetadata: scenmodel.JSONBytesEmpty(),
+		GasPrice:     scenmodel.JSONUint64Zero(),
+		GasLimit:     scenmodel.JSONUint64Zero(),
 	}
 
 	var err error
