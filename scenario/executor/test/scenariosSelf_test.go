@@ -114,6 +114,15 @@ func TestScenariosCheckCodeErr(t *testing.T) {
 			"Check state \"check-1\": bad account code. Account: sc:contract-address. Want: \"file:set-check-code.scen.json\". Have: \"0x7b0a2020202022636f6d...\"")
 }
 
+func TestScenariosCheckCodeMetadataErr(t *testing.T) {
+	ScenariosTest(t).
+		Folder("scenarios-self-test/set-check").
+		File("set-check-codemetadata.err.json").
+		Run().
+		RequireError(
+			"Check state \"check-1\": bad account code metadata. Account: sc:contract-address. Want: \"0x0000\". Have: \"0x0102\"")
+}
+
 func TestScenariosCheckStorageErr1(t *testing.T) {
 	ScenariosTest(t).
 		Folder("scenarios-self-test/set-check").

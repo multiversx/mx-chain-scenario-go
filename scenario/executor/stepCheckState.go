@@ -100,6 +100,17 @@ func (ae *ScenarioExecutor) checkAccounts(baseErrMsg string, checkAccounts *scen
 					er.CodeHint))
 		}
 
+		if !expectedAcct.CodeMetadata.IsUnspecified() &&
+			!expectedAcct.CodeMetadata.Check(matchingAcct.CodeMetadata) {
+			return fmt.Errorf("%s bad account code metadata. Account: %s. Want: %s. Have: \"%s\"",
+				baseErrMsg,
+				expectedAcct.Address.Original,
+				oj.JSONString(expectedAcct.CodeMetadata.Original),
+				ae.exprReconstructor.Reconstruct(
+					matchingAcct.CodeMetadata,
+					er.HexHint))
+		}
+
 		if !expectedAcct.Owner.IsUnspecified() && !bytes.Equal(matchingAcct.OwnerAddress, expectedAcct.Owner.Value) {
 			return fmt.Errorf("%s bad account owner. Account: %s. Want: %s. Have: \"%s\"",
 				baseErrMsg,

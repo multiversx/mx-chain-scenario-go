@@ -8,9 +8,10 @@ import (
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
-
-	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
+
+// DefaultCodeMetadata indicates what code metadata to use in smart contracts if unspecified
+var DefaultCodeMetadata = []byte{0x05, 0x06}
 
 // ExecuteSetStateStep executes a SetStateStep.
 func (ae *ScenarioExecutor) ExecuteSetStateStep(step *scenmodel.SetStateStep) error {
@@ -124,6 +125,11 @@ func convertAccount(testAcct *scenmodel.Account, world *worldmock.MockWorld) (*w
 		return nil, errors.New("bad test: account address should be 32 bytes long")
 	}
 
+	codeMetadata := testAcct.CodeMetadata.Value
+	if len(testAcct.Code.Value) > 0 && testAcct.CodeMetadata.Unspecified {
+		codeMetadata = DefaultCodeMetadata
+	}
+
 	account := &worldmock.Account{
 		Address:         testAcct.Address.Value,
 		Nonce:           testAcct.Nonce.Value,
@@ -133,16 +139,12 @@ func convertAccount(testAcct *scenmodel.Account, world *worldmock.MockWorld) (*w
 		Username:        testAcct.Username.Value,
 		Storage:         storage,
 		Code:            testAcct.Code.Value,
+		CodeMetadata:    codeMetadata,
 		OwnerAddress:    testAcct.Owner.Value,
 		AsyncCallData:   testAcct.AsyncCallData,
 		ShardID:         uint32(testAcct.Shard.Value),
 		IsSmartContract: len(testAcct.Code.Value) > 0,
-		CodeMetadata: (&vmcommon.CodeMetadata{
-			Payable:     true,
-			Upgradeable: true,
-			Readable:    true,
-		}).ToBytes(), // TODO: add explicit fields in scenario JSON
-		MockWorld: world,
+		MockWorld:       world,
 	}
 
 	return account, nil
