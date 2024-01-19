@@ -185,7 +185,7 @@ func TestScenariosCheckESDTErr1(t *testing.T) {
   for token: NFT-123456, nonce: 1: Bad royalties. Want: "2001". Have: "2000"
   for token: NFT-123456, nonce: 1: Bad hash. Want: "keccak256:str:another_hash". Have: 0x54e3ea4bdef3b22154767a2cae081fca2bec2eae1ec62ee71308cb2a300d675d (str:"T\xe3\xeaK\xde\xf3\xb2!Tvz,\xae\b\x1f\xca+\xec.\xae\x1e\xc6.\xe7\x13\b\xcb*0\rg]")
   for token: NFT-123456, nonce: 1: Bad URI. Want: ["str:www.cool_nft.com/another_nft.jpg", "*"]. Have: ["str:www.cool_nft.com/my_nft.jpg", "str:www.cool_nft.com/my_nft.json"]
-  for token: NFT-123456, nonce: 1: Bad attributes. Want: "str:other_attributes". Have: "str:serialized_attributes"`)
+  for token: NFT-123456, nonce: 1: Bad attributes. Want: "0x227374723a6f746865725f6174747269627574657322 ("str:other_attributes")". Have: "0x73657269616c697a65645f61747472696275746573 (str:serialized_attributes)"`)
 }
 
 func TestScenariosEsdtZeroBalance(t *testing.T) {
