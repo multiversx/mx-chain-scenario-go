@@ -83,3 +83,8 @@ func EnableEpochsHandlerStubAllFlags() *EnableEpochsHandlerStub {
 		},
 	}
 }
+
+// EnableEpochsHandlerStubNoFlags creates a new EnableEpochsHandlerStub with all flags disabled
+func EnableEpochsHandlerStubNoFlags() *EnableEpochsHandlerStub {
+	return &EnableEpochsHandlerStub{}
+}
