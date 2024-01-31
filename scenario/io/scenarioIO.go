@@ -10,6 +10,8 @@ import (
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 )
 
+var defaultVMType = []byte{0, 0}
+
 // ParseScenariosScenario reads and parses a Scenarios scenario from a JSON file.
 func ParseScenariosScenario(parser scenjparse.Parser, scenFilePath string) (*scenmodel.Scenario, error) {
 	var err error
@@ -42,7 +44,7 @@ func ParseScenariosScenario(parser scenjparse.Parser, scenFilePath string) (*sce
 
 // ParseScenariosScenarioDefaultParser reads and parses a Scenarios scenario from a JSON file.
 func ParseScenariosScenarioDefaultParser(scenFilePath string) (*scenmodel.Scenario, error) {
-	parser := scenjparse.NewParser(NewDefaultFileResolver())
+	parser := scenjparse.NewParser(NewDefaultFileResolver(), defaultVMType)
 	parser.ExprInterpreter.FileResolver.SetContext(scenFilePath)
 	return ParseScenariosScenario(parser, scenFilePath)
 }

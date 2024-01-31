@@ -74,6 +74,11 @@ func (*DummyVMBuilder) GasScheduleMapFromScenarios(scenGasSchedule scenmodel.Gas
 	return gasMap, nil
 }
 
+// GetVMType returns the configured VM type.
+func (*DummyVMBuilder) GetVMType() []byte {
+	return []byte{0, 0}
+}
+
 // NewVM creates the execution VM host with references to the world mock and gas schedule.
 func (*DummyVMBuilder) NewVM(world *worldmock.MockWorld, gasSchedule map[string]map[string]uint64) (scenarioexec.VMInterface, error) {
 	return &DummyVM{}, nil

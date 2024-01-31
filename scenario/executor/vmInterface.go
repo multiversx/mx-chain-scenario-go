@@ -27,6 +27,9 @@ type VMBuilder interface {
 	// GasScheduleMapFromScenarios converts the gas schedule name from a scenario into an actual gas map.
 	GasScheduleMapFromScenarios(scenGasSchedule scenmodel.GasSchedule) (worldmock.GasScheduleMap, error)
 
+	// GetVMType returns the configured VM type, normally [5, 0].
+	GetVMType() []byte
+
 	// NewVM creates the execution VM host with references to the world mock and gas schedule.
 	NewVM(world *worldmock.MockWorld, gasSchedule map[string]map[string]uint64) (VMInterface, error)
 }

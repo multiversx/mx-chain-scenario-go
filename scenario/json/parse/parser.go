@@ -15,10 +15,11 @@ type Parser struct {
 }
 
 // NewParser provides a new Parser instance.
-func NewParser(fileResolver fr.FileResolver) Parser {
+func NewParser(fileResolver fr.FileResolver, vmType []byte) Parser {
 	return Parser{
 		ExprInterpreter: ei.ExprInterpreter{
 			FileResolver: fileResolver,
+			VMType:       vmType,
 		},
 		AllowEsdtTxLegacySyntax:          true,
 		AllowEsdtLegacySetSyntax:         true,
