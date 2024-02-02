@@ -8,6 +8,7 @@ import (
 
 	scenexec "github.com/multiversx/mx-chain-scenario-go/scenario/executor"
 	scenio "github.com/multiversx/mx-chain-scenario-go/scenario/io"
+	scenjparse "github.com/multiversx/mx-chain-scenario-go/scenario/json/parse"
 )
 
 // RunScenariosAtPath runs either;
@@ -20,25 +21,23 @@ func RunScenariosAtPath(path string, options CLIRunOptions) error {
 	}
 
 	executor := scenexec.NewScenarioExecutor(options.VMBuilder)
+	controller := &scenio.ScenarioController{
+		Executor: executor,
+		Parser: scenjparse.NewParser(
+			scenio.NewDefaultFileResolver(),
+			options.VMBuilder.GetVMType()),
+	}
 
 	switch {
 	case fi.IsDir():
-		runner := scenio.NewScenarioController(
-			executor,
-			scenio.NewDefaultFileResolver(),
-		)
-		err = runner.RunAllJSONScenariosInDirectory(
+		err = controller.RunAllJSONScenariosInDirectory(
 			path,
 			"",
 			".scen.json",
 			[]string{},
 			options.RunOptions)
 	case strings.HasSuffix(path, ".scen.json"):
-		runner := scenio.NewScenarioController(
-			executor,
-			scenio.NewDefaultFileResolver(),
-		)
-		err = runner.RunSingleJSONScenario(path, options.RunOptions)
+		err = controller.RunSingleJSONScenario(path, options.RunOptions)
 	default:
 		err = errors.New("only directories and scenario files accepted as path")
 	}

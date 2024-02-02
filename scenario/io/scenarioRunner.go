@@ -25,10 +25,10 @@ type ScenarioController struct {
 }
 
 // NewScenarioController creates new ScenarioController instance.
-func NewScenarioController(executor ScenarioRunner, fileResolver fr.FileResolver) *ScenarioController {
+func NewScenarioController(executor ScenarioRunner, fileResolver fr.FileResolver, vmType []byte) *ScenarioController {
 	return &ScenarioController{
 		Executor: executor,
-		Parser:   scenjparse.NewParser(fileResolver),
+		Parser:   scenjparse.NewParser(fileResolver, vmType),
 	}
 }
 

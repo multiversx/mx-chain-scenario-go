@@ -12,6 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// only for this test
+var vmType = []byte{'W', 'W'}
+
 func loadExampleFile(path string) ([]byte, error) {
 	// Open our jsonFile
 	var jsonFile *os.File
@@ -37,7 +40,8 @@ func TestWriteScenario(t *testing.T) {
 	p := scenjparse.NewParser(
 		fr.NewDefaultFileResolver().ReplacePath(
 			"smart-contract.wasm",
-			"exampleFile.txt"))
+			"exampleFile.txt"),
+		vmType)
 
 	scenario, parseErr := p.ParseScenarioFile(contents)
 	require.Nil(t, parseErr)

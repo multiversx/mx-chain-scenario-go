@@ -63,12 +63,14 @@ func (mtb *ScenariosTestBuilder) Exclude(path string) *ScenariosTestBuilder {
 
 // Run will start the testing process
 func (mtb *ScenariosTestBuilder) Run() *ScenariosTestBuilder {
-	executor := scenexec.NewScenarioExecutor(&DummyVMBuilder{})
+	vmBuilder := &DummyVMBuilder{}
+	executor := scenexec.NewScenarioExecutor(vmBuilder)
 	defer executor.Close()
 
 	runner := scenio.NewScenarioController(
 		executor,
 		scenio.NewDefaultFileResolver(),
+		vmBuilder.GetVMType(),
 	)
 
 	if len(mtb.singleFile) > 0 {
