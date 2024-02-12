@@ -14,7 +14,7 @@ func (ae *ScenarioExecutor) ExecuteExternalStep(step *scenmodel.ExternalStepsSte
 
 	fileResolverBackup := ae.fileResolver
 	clonedFileResolver := ae.fileResolver.Clone()
-	externalStepsRunner := scenio.NewScenarioController(ae, clonedFileResolver)
+	externalStepsRunner := scenio.NewScenarioController(ae, clonedFileResolver, ae.vmBuilder.GetVMType())
 
 	extAbsPth := ae.fileResolver.ResolveAbsolutePath(step.Path)
 	setExternalStepGasTracing(ae, step)

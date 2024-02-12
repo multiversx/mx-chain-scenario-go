@@ -8,7 +8,6 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/multiversx/mx-chain-core-go/core"
 	oj "github.com/multiversx/mx-chain-scenario-go/orderedjson"
 	fr "github.com/multiversx/mx-chain-scenario-go/scenario/expression/fileresolver"
 	twos "github.com/multiversx/mx-components-big-int/twos-complement"
@@ -40,7 +39,7 @@ const nestedPrefix = "nested:"
 // ExprInterpreter provides context for computing scenario values.
 type ExprInterpreter struct {
 	FileResolver fr.FileResolver
-	VMType       *[core.VMTypeLen]byte
+	VMType       []byte
 }
 
 // InterpretSubTree attempts to produce a value based on a JSON subtree.
@@ -207,9 +206,9 @@ func (ei *ExprInterpreter) InterpretString(strRaw string) ([]byte, error) {
 
 // GetVMType yields the configured VM type, which is used for generating SC addresses.
 // Will yield default value [0, 0] is not explicitly configured.
-func (ei *ExprInterpreter) GetVMType() *[core.VMTypeLen]byte {
+func (ei *ExprInterpreter) GetVMType() []byte {
 	if ei.VMType == nil {
-		ei.VMType = &[core.VMTypeLen]byte{0, 0}
+		ei.VMType = []byte{0, 0}
 	}
 	return ei.VMType
 }
