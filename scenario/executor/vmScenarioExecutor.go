@@ -71,6 +71,11 @@ func (ae *ScenarioExecutor) GetVM() vmcommon.VMExecutionHandler {
 	return ae.vm
 }
 
+// GetVM returns the configured VM type.
+func (ae *ScenarioExecutor) GetVMType() []byte {
+	return ae.vmBuilder.GetVMType()
+}
+
 // Reset clears state/world.
 // Is called in RunAllJSONScenariosInDirectory, but not in RunSingleJSONScenario.
 func (ae *ScenarioExecutor) Reset() {

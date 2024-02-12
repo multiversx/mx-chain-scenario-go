@@ -13,7 +13,7 @@ import (
 
 func interpreter() mei.ExprInterpreter {
 	return mei.ExprInterpreter{
-		VMType: &[2]byte{'V', 'M'},
+		VMType: []byte{'V', 'M'},
 	}
 }
 

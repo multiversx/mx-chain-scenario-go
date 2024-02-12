@@ -21,7 +21,7 @@ var zero = big.NewInt(0)
 
 // NewAddress provides the address for a new account.
 // It looks up the explicit new address mocks, if none found generates one using a fake but realistic algorithm.
-func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, _ []byte) ([]byte, error) {
+func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, vmType []byte) ([]byte, error) {
 	// custom error
 	if b.Err != nil {
 		return nil, b.Err
@@ -38,11 +38,7 @@ func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, _ []b
 
 	// If a mock address wasn't registered for the specified creatorAddress, generate one automatically.
 	// This is not the real algorithm but it's simple and close enough.
-	vmType := b.VMType
-	if vmType == nil {
-		vmType = DefaultVMType
-	}
-	result := GenerateMockAddress(vmType, creatorAddress, creatorNonce)
+	result := GenerateMockAddress(creatorAddress, creatorNonce, vmType)
 	b.LastCreatedContractAddress = result
 	return result, nil
 }
