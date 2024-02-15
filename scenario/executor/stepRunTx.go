@@ -75,14 +75,6 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 		}
 
 		gasForExecution = tx.GasLimit.Value
-		if tx.ESDTValue != nil {
-			gasRemaining, err := ae.directESDTTransferFromTx(tx)
-			if err != nil {
-				return nil, err
-			}
-
-			gasForExecution = gasRemaining
-		}
 	}
 
 	// we also use fake vm outputs for transactions that don't use the VM, just for convenience
@@ -110,14 +102,31 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			gasForExecution = math.MaxInt64
 			fallthrough
 		case scenmodel.ScCall:
-			output, err = ae.scCall(txIndex, tx, gasForExecution)
-			if err != nil {
-				return nil, err
-			}
-			if ae.PeekTraceGas() {
-				fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
+			if tx.ESDTValue != nil {
+				gasRemaining, err := ae.directESDTTransferFromTx(tx)
+				if err != nil {
+					return nil, err
+				}
+
+				gasForExecution = gasRemaining
+			} else {
+				output, err = ae.scCall(txIndex, tx, gasForExecution)
+				if err != nil {
+					return nil, err
+				}
+				if ae.PeekTraceGas() {
+					fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
+				}
 			}
 		case scenmodel.Transfer:
+			if tx.ESDTValue != nil {
+				gasRemaining, err := ae.directESDTTransferFromTx(tx)
+				if err != nil {
+					return nil, err
+				}
+
+				gasForExecution = gasRemaining
+			}
 			output = ae.simpleTransferOutput(tx)
 		case scenmodel.ValidatorReward:
 			output, err = ae.validatorRewardOutput(tx)
