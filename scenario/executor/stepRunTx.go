@@ -103,12 +103,21 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			fallthrough
 		case scenmodel.ScCall:
 			if tx.ESDTValue != nil {
-				gasRemaining, err := ae.directESDTTransferFromTx(tx)
-				if err != nil {
-					return nil, err
+				if len(tx.Function) > 0 {
+					output, err = ae.ESDTCall(tx)
+					if err != nil {
+						return nil, err
+					}
+					if ae.PeekTraceGas() {
+						fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
+					}
+				} else {
+					_, err := ae.ESDTTransferFromTx(tx)
+					if err != nil {
+						return nil, err
+					}
+					output = ae.simpleTransferOutput(tx)
 				}
-
-				gasForExecution = gasRemaining
 			} else {
 				output, err = ae.scCall(txIndex, tx, gasForExecution)
 				if err != nil {
@@ -120,12 +129,10 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			}
 		case scenmodel.Transfer:
 			if tx.ESDTValue != nil {
-				gasRemaining, err := ae.directESDTTransferFromTx(tx)
+				_, err := ae.ESDTTransferFromTx(tx)
 				if err != nil {
 					return nil, err
 				}
-
-				gasForExecution = gasRemaining
 			}
 			output = ae.simpleTransferOutput(tx)
 		case scenmodel.ValidatorReward:
@@ -286,7 +293,26 @@ func (ae *ScenarioExecutor) scCall(txIndex string, tx *scenmodel.Transaction, ga
 	return ae.vm.RunSmartContractCall(input)
 }
 
-func (ae *ScenarioExecutor) directESDTTransferFromTx(tx *scenmodel.Transaction) (uint64, error) {
+func (ae *ScenarioExecutor) ESDTCall(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
+	input := &vmcommon.ContractCallInput{
+		VMInput: vmcommon.VMInput{
+			CallerAddr:  tx.From.Value,
+			Arguments:   scenmodel.JSONBytesFromTreeValues(tx.Arguments),
+			CallValue:   big.NewInt(0),
+			CallType:    vm.DirectCall,
+			GasPrice:    tx.GasPrice.Value,
+			GasProvided: tx.GasLimit.Value,
+			GasLocked:   0,
+		},
+		RecipientAddr:     tx.To.Value,
+		Function:          tx.Function,
+		AllowInitFunction: false,
+	}
+
+	return ae.vm.RunSmartContractCall(input)
+}
+
+func (ae *ScenarioExecutor) ESDTTransferFromTx(tx *scenmodel.Transaction) (uint64, error) {
 	nrTransfers := len(tx.ESDTValue)
 
 	if nrTransfers == 1 {
