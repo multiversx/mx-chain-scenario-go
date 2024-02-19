@@ -65,7 +65,7 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 	callType vm.CallType,
 	gasLimit uint64,
 	gasPrice uint64,
-) (uint64, error) {
+) (*vmcommon.VMOutput, error) {
 	esdtTransferInput := &vmcommon.ContractCallInput{
 		VMInput: vmcommon.VMInput{
 			CallerAddr:  sender,
@@ -92,17 +92,17 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 
 	vmOutput, err := bf.ProcessBuiltInFunction(esdtTransferInput)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if vmOutput.ReturnCode != vmcommon.Ok {
-		return 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"ESDTtransfer failed: retcode = %d, msg = %s",
 			vmOutput.ReturnCode,
 			vmOutput.ReturnMessage)
 	}
 
-	return vmOutput.GasRemaining, nil
+	return vmOutput, nil
 }
 
 // PerformDirectMultiESDTTransfer -
@@ -113,7 +113,7 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 	callType vm.CallType,
 	gasLimit uint64,
 	gasPrice uint64,
-) (uint64, error) {
+) (*vmcommon.VMOutput, error) {
 	nrTransfers := len(esdtTransfers)
 	nrTransfersAsBytes := big.NewInt(0).SetUint64(uint64(nrTransfers)).Bytes()
 
@@ -143,15 +143,15 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 
 	vmOutput, err := bf.ProcessBuiltInFunction(multiTransferInput)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if vmOutput.ReturnCode != vmcommon.Ok {
-		return 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"MultiESDTtransfer failed: retcode = %d, msg = %s",
 			vmOutput.ReturnCode,
 			vmOutput.ReturnMessage)
 	}
 
-	return vmOutput.GasRemaining, nil
+	return vmOutput, nil
 }
