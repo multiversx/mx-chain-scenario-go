@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	github.com/TwiN/go-color v1.1.0
-	github.com/multiversx/mx-chain-core-go v1.2.13
-	github.com/multiversx/mx-chain-logger-go v1.0.13
-	github.com/multiversx/mx-chain-vm-common-go v1.5.9
+	github.com/multiversx/mx-chain-core-go v1.2.19-0.20240129082057-a76d0c995cf2
+	github.com/multiversx/mx-chain-logger-go v1.0.14-0.20240129144507-d00e967c890c
+	github.com/multiversx/mx-chain-vm-common-go v1.5.12-0.20240129145149-4fe61574f566
 	github.com/multiversx/mx-components-big-int v1.0.0
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.27.1
