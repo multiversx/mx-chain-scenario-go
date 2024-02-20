@@ -285,16 +285,13 @@ func (ae *ScenarioExecutor) scCall(txIndex string, tx *scenmodel.Transaction, ga
 }
 
 func (ae *ScenarioExecutor) ESDTTransferFromTx(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
+	var output *vmcommon.VMOutput
+	var err error
+
 	nrTransfers := len(tx.ESDTValue)
 
-	if len(tx.Function) > 0 {
-		output, err := ae.ESDTCall(tx)
-
-		return output, err
-	}
-
 	if nrTransfers == 1 {
-		return ae.World.BuiltinFuncs.PerformDirectESDTTransfer(
+		output, err = ae.World.BuiltinFuncs.PerformDirectESDTTransfer(
 			tx.From.Value,
 			tx.To.Value,
 			tx.ESDTValue[0].TokenIdentifier.Value,
@@ -304,7 +301,7 @@ func (ae *ScenarioExecutor) ESDTTransferFromTx(tx *scenmodel.Transaction) (*vmco
 			tx.GasLimit.Value,
 			tx.GasPrice.Value)
 	} else {
-		return ae.World.BuiltinFuncs.PerformDirectMultiESDTTransfer(
+		output, err = ae.World.BuiltinFuncs.PerformDirectMultiESDTTransfer(
 			tx.From.Value,
 			tx.To.Value,
 			tx.ESDTValue,
@@ -313,6 +310,11 @@ func (ae *ScenarioExecutor) ESDTTransferFromTx(tx *scenmodel.Transaction) (*vmco
 			tx.GasPrice.Value)
 	}
 
+	if len(tx.Function) > 0 {
+		output, err = ae.callAfterESDTTransfer(tx)
+	}
+
+	return output, err
 }
 
 func (ae *ScenarioExecutor) updateStateAfterTx(
@@ -377,7 +379,7 @@ func addESDTToVMInput(esdtData []*scenmodel.ESDTTxData, vmInput *vmcommon.VMInpu
 	}
 }
 
-func (ae *ScenarioExecutor) ESDTCall(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
+func (ae *ScenarioExecutor) callAfterESDTTransfer(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
 	input := &vmcommon.ContractCallInput{
 		VMInput: vmcommon.VMInput{
 			CallerAddr:  tx.From.Value,
@@ -392,6 +394,7 @@ func (ae *ScenarioExecutor) ESDTCall(tx *scenmodel.Transaction) (*vmcommon.VMOut
 		Function:          tx.Function,
 		AllowInitFunction: false,
 	}
+	addESDTToVMInput(tx.ESDTValue, &input.VMInput)
 
 	return ae.vm.RunSmartContractCall(input)
 }
