@@ -1,14 +1,11 @@
 package worldmock
 
 import (
-	"fmt"
 	"math/big"
 
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/core/check"
 	"github.com/multiversx/mx-chain-core-go/data/esdt"
-	"github.com/multiversx/mx-chain-core-go/data/vm"
-	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
@@ -62,6 +59,9 @@ func ConvertToBuiltinFunction(tx *vmcommon.ContractCallInput) *vmcommon.Contract
 	}
 }
 
+// PerformDirectESDTTransfer calls the real ESDTTransfer function immediately;
+// only works for in-shard transfers for now, but it will be expanded to
+// cross-shard.
 func convertToESDTTransfer(tx *vmcommon.ContractCallInput, esdtTransfer *vmcommon.ESDTTransfer) *vmcommon.ContractCallInput {
 	esdtTransferInput := &vmcommon.ContractCallInput{
 		VMInput: vmcommon.VMInput{
@@ -133,110 +133,4 @@ func convertToMultiESDTTransfer(tx *vmcommon.ContractCallInput) *vmcommon.Contra
 	}
 
 	return multiTransferInput
-}
-
-// PerformDirectESDTTransfer calls the real ESDTTransfer function immediately;
-// only works for in-shard transfers for now, but it will be expanded to
-// cross-shard.
-//
-// Deprecated. TODO: remove.
-func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
-	sender []byte,
-	receiver []byte,
-	token []byte,
-	nonce uint64,
-	value *big.Int,
-	callType vm.CallType,
-	gasLimit uint64,
-	gasPrice uint64,
-) (*vmcommon.VMOutput, error) {
-	esdtTransferInput := &vmcommon.ContractCallInput{
-		VMInput: vmcommon.VMInput{
-			CallerAddr:  sender,
-			Arguments:   make([][]byte, 0),
-			CallValue:   big.NewInt(0),
-			CallType:    callType,
-			GasPrice:    gasPrice,
-			GasProvided: gasLimit,
-			GasLocked:   0,
-		},
-		RecipientAddr:     receiver,
-		Function:          core.BuiltInFunctionESDTTransfer,
-		AllowInitFunction: false,
-	}
-
-	if nonce > 0 {
-		esdtTransferInput.Function = core.BuiltInFunctionESDTNFTTransfer
-		esdtTransferInput.RecipientAddr = esdtTransferInput.CallerAddr
-		nonceAsBytes := big.NewInt(0).SetUint64(nonce).Bytes()
-		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments, token, nonceAsBytes, value.Bytes(), receiver)
-	} else {
-		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments, token, value.Bytes())
-	}
-
-	vmOutput, err := bf.ProcessBuiltInFunction(esdtTransferInput)
-	if err != nil {
-		return nil, err
-	}
-
-	if vmOutput.ReturnCode != vmcommon.Ok {
-		return nil, fmt.Errorf(
-			"ESDTtransfer failed: retcode = %d, msg = %s",
-			vmOutput.ReturnCode,
-			vmOutput.ReturnMessage)
-	}
-
-	return vmOutput, nil
-}
-
-// PerformDirectMultiESDTTransfer -
-// Deprecated. TODO: remove.
-func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
-	sender []byte,
-	receiver []byte,
-	esdtTransfers []*scenmodel.ESDTTxData,
-	callType vm.CallType,
-	gasLimit uint64,
-	gasPrice uint64,
-) (*vmcommon.VMOutput, error) {
-	nrTransfers := len(esdtTransfers)
-	nrTransfersAsBytes := big.NewInt(0).SetUint64(uint64(nrTransfers)).Bytes()
-
-	multiTransferInput := &vmcommon.ContractCallInput{
-		VMInput: vmcommon.VMInput{
-			CallerAddr:  sender,
-			Arguments:   make([][]byte, 0),
-			CallValue:   big.NewInt(0),
-			CallType:    callType,
-			GasPrice:    gasPrice,
-			GasProvided: gasLimit,
-			GasLocked:   0,
-		},
-		RecipientAddr:     sender,
-		Function:          core.BuiltInFunctionMultiESDTNFTTransfer,
-		AllowInitFunction: false,
-	}
-	multiTransferInput.Arguments = append(multiTransferInput.Arguments, receiver, nrTransfersAsBytes)
-
-	for i := 0; i < nrTransfers; i++ {
-		token := esdtTransfers[i].TokenIdentifier.Value
-		nonceAsBytes := big.NewInt(0).SetUint64(esdtTransfers[i].Nonce.Value).Bytes()
-		value := esdtTransfers[i].Value.Value
-
-		multiTransferInput.Arguments = append(multiTransferInput.Arguments, token, nonceAsBytes, value.Bytes())
-	}
-
-	vmOutput, err := bf.ProcessBuiltInFunction(multiTransferInput)
-	if err != nil {
-		return nil, err
-	}
-
-	if vmOutput.ReturnCode != vmcommon.Ok {
-		return nil, fmt.Errorf(
-			"MultiESDTtransfer failed: retcode = %d, msg = %s",
-			vmOutput.ReturnCode,
-			vmOutput.ReturnMessage)
-	}
-
-	return vmOutput, nil
 }
