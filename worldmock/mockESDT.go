@@ -50,12 +50,96 @@ func (bf *BuiltinFunctionsWrapper) SetTokenData(address []byte, tokenIdentifier 
 	return account.SetTokenData(tokenIdentifier, nonce, tokenData)
 }
 
+// ConvertToBuiltinFunction converts a VM input with a populated ESDT field into a built-in function call.
+func ConvertToBuiltinFunction(tx *vmcommon.ContractCallInput) *vmcommon.ContractCallInput {
+	switch len(tx.ESDTTransfers) {
+	case 0:
+		return tx
+	case 1:
+		return convertToESDTTransfer(tx, tx.ESDTTransfers[0])
+	default:
+		return convertToMultiESDTTransfer(tx)
+	}
+}
+
+func convertToESDTTransfer(tx *vmcommon.ContractCallInput, esdtTransfer *vmcommon.ESDTTransfer) *vmcommon.ContractCallInput {
+	esdtTransferInput := &vmcommon.ContractCallInput{
+		VMInput: vmcommon.VMInput{
+			CallerAddr:  tx.CallerAddr,
+			Arguments:   make([][]byte, 0),
+			CallValue:   big.NewInt(0),
+			CallType:    tx.CallType,
+			GasPrice:    tx.GasPrice,
+			GasProvided: tx.GasProvided,
+			GasLocked:   tx.GasLocked,
+		},
+		RecipientAddr:     tx.RecipientAddr,
+		Function:          core.BuiltInFunctionESDTTransfer,
+		AllowInitFunction: false,
+	}
+
+	if esdtTransfer.ESDTTokenNonce > 0 {
+		esdtTransferInput.Function = core.BuiltInFunctionESDTNFTTransfer
+		esdtTransferInput.RecipientAddr = esdtTransferInput.CallerAddr
+		nonceAsBytes := big.NewInt(0).SetUint64(esdtTransfer.ESDTTokenNonce).Bytes()
+		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments,
+			esdtTransfer.ESDTTokenName, nonceAsBytes, esdtTransfer.ESDTValue.Bytes(), tx.RecipientAddr)
+	} else {
+		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments,
+			esdtTransfer.ESDTTokenName, esdtTransfer.ESDTValue.Bytes())
+	}
+
+	if len(tx.Function) > 0 {
+		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments, []byte(tx.Function))
+		esdtTransferInput.Arguments = append(esdtTransferInput.Arguments, tx.Arguments...)
+	}
+
+	return esdtTransferInput
+}
+
+func convertToMultiESDTTransfer(tx *vmcommon.ContractCallInput) *vmcommon.ContractCallInput {
+	multiTransferInput := &vmcommon.ContractCallInput{
+		VMInput: vmcommon.VMInput{
+			CallerAddr:  tx.CallerAddr,
+			Arguments:   make([][]byte, 0),
+			CallValue:   big.NewInt(0),
+			CallType:    tx.CallType,
+			GasPrice:    tx.GasPrice,
+			GasProvided: tx.GasProvided,
+			GasLocked:   tx.GasLocked,
+		},
+		RecipientAddr:     tx.CallerAddr,
+		Function:          core.BuiltInFunctionMultiESDTNFTTransfer,
+		AllowInitFunction: false,
+	}
+
+	multiTransferInput.Arguments = append(multiTransferInput.Arguments, tx.RecipientAddr)
+
+	nrTransfers := len(tx.ESDTTransfers)
+	nrTransfersAsBytes := big.NewInt(0).SetUint64(uint64(nrTransfers)).Bytes()
+	multiTransferInput.Arguments = append(multiTransferInput.Arguments, nrTransfersAsBytes)
+
+	for _, esdtTransfer := range tx.ESDTTransfers {
+		token := esdtTransfer.ESDTTokenName
+		nonceAsBytes := big.NewInt(0).SetUint64(esdtTransfer.ESDTTokenNonce).Bytes()
+		value := esdtTransfer.ESDTValue
+
+		multiTransferInput.Arguments = append(multiTransferInput.Arguments, token, nonceAsBytes, value.Bytes())
+	}
+
+	if len(tx.Function) > 0 {
+		multiTransferInput.Arguments = append(multiTransferInput.Arguments, []byte(tx.Function))
+		multiTransferInput.Arguments = append(multiTransferInput.Arguments, tx.Arguments...)
+	}
+
+	return multiTransferInput
+}
+
 // PerformDirectESDTTransfer calls the real ESDTTransfer function immediately;
 // only works for in-shard transfers for now, but it will be expanded to
 // cross-shard.
-// TODO rewrite to simulate what the SCProcessor does when executing a tx with
-// data "ESDTTransfer@token@value@contractfunc@contractargs..."
-// TODO this function duplicates code from host.ExecuteESDTTransfer(), must refactor
+//
+// Deprecated. TODO: remove.
 func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 	sender []byte,
 	receiver []byte,
@@ -65,7 +149,7 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 	callType vm.CallType,
 	gasLimit uint64,
 	gasPrice uint64,
-) (uint64, error) {
+) (*vmcommon.VMOutput, error) {
 	esdtTransferInput := &vmcommon.ContractCallInput{
 		VMInput: vmcommon.VMInput{
 			CallerAddr:  sender,
@@ -92,20 +176,21 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectESDTTransfer(
 
 	vmOutput, err := bf.ProcessBuiltInFunction(esdtTransferInput)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if vmOutput.ReturnCode != vmcommon.Ok {
-		return 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"ESDTtransfer failed: retcode = %d, msg = %s",
 			vmOutput.ReturnCode,
 			vmOutput.ReturnMessage)
 	}
 
-	return vmOutput.GasRemaining, nil
+	return vmOutput, nil
 }
 
 // PerformDirectMultiESDTTransfer -
+// Deprecated. TODO: remove.
 func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 	sender []byte,
 	receiver []byte,
@@ -113,7 +198,7 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 	callType vm.CallType,
 	gasLimit uint64,
 	gasPrice uint64,
-) (uint64, error) {
+) (*vmcommon.VMOutput, error) {
 	nrTransfers := len(esdtTransfers)
 	nrTransfersAsBytes := big.NewInt(0).SetUint64(uint64(nrTransfers)).Bytes()
 
@@ -143,15 +228,15 @@ func (bf *BuiltinFunctionsWrapper) PerformDirectMultiESDTTransfer(
 
 	vmOutput, err := bf.ProcessBuiltInFunction(multiTransferInput)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 
 	if vmOutput.ReturnCode != vmcommon.Ok {
-		return 0, fmt.Errorf(
+		return nil, fmt.Errorf(
 			"MultiESDTtransfer failed: retcode = %d, msg = %s",
 			vmOutput.ReturnCode,
 			vmOutput.ReturnMessage)
 	}
 
-	return vmOutput.GasRemaining, nil
+	return vmOutput, nil
 }
