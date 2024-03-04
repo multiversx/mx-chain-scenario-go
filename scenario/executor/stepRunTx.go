@@ -1,17 +1,22 @@
 package scenexec
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"math"
 	"math/big"
+	"strings"
 
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
+
+const scAddrPrefix = "sc:"
 
 // ExecuteTxStep executes a TxStep.
 func (ae *ScenarioExecutor) ExecuteTxStep(step *scenmodel.TxStep) (*vmcommon.VMOutput, error) {
@@ -116,6 +121,16 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			}
 			if ae.PeekTraceGas() {
 				fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
+			}
+		case scenmodel.ScUpgrade:
+			output, err = ae.upgradeContract(txIndex, tx, gasForExecution)
+
+			if err != nil {
+				return nil, err
+			}
+
+			if ae.PeekTraceGas() {
+				fmt.Println("\nIn txID:", txIndex, ", step type:ScUpgrade, total gas used:", gasForExecution-output.GasRemaining)
 			}
 		case scenmodel.Transfer:
 			output = ae.simpleTransferOutput(tx)
@@ -248,6 +263,26 @@ func (ae *ScenarioExecutor) scCreate(txIndex string, tx *scenmodel.Transaction, 
 	return ae.vm.RunSmartContractCreate(input)
 }
 
+func (ae *ScenarioExecutor) upgradeContract(txIndex string, tx *scenmodel.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
+	recipient := ae.World.AcctMap.GetAccount(tx.To.Value)
+	if recipient == nil {
+		return nil, fmt.Errorf("tx recipient (address: %s) does not exist", hex.EncodeToString(tx.To.Value))
+	}
+	if len(recipient.Code) == 0 {
+		return nil, fmt.Errorf("tx recipient (address: %s) is not a smart contract", hex.EncodeToString(tx.To.Value))
+	}
+
+	output, err := ae.scCreate(txIndex, tx, gasLimit)
+
+	if err != nil {
+		return nil, err
+	}
+
+	updateContract(tx, ae.World.AcctMap, output)
+
+	return output, err
+}
+
 func (ae *ScenarioExecutor) scCall(txIndex string, tx *scenmodel.Transaction, gasLimit uint64) (*vmcommon.VMOutput, error) {
 	recipient := ae.World.AcctMap.GetAccount(tx.To.Value)
 	if recipient == nil {
@@ -359,6 +394,27 @@ func addESDTToVMInput(esdtData []*scenmodel.ESDTTxData, vmInput *vmcommon.VMInpu
 			} else {
 				vmInput.ESDTTransfers[i].ESDTTokenType = uint32(core.Fungible)
 			}
+		}
+	}
+}
+
+func updateContract(tx *scenmodel.Transaction, worldAcctMapp worldmock.AccountMap, output *vmcommon.VMOutput) {
+	var upgradedAccount *worldmock.Account
+
+	upgradedContract := tx.To.Original[len(scAddrPrefix):]
+	upgradedAccountName := ""
+	for accountName, account := range worldAcctMapp {
+		if strings.Contains(accountName, upgradedContract) {
+			upgradedAccountName = accountName
+			upgradedAccount = account
+		}
+	}
+
+	for name, acc := range output.OutputAccounts {
+		if bytes.Equal(tx.Code.Value, acc.Code) {
+			delete(output.OutputAccounts, name)
+			acc.Address = upgradedAccount.Address
+			output.OutputAccounts[upgradedAccountName] = acc
 		}
 	}
 }
