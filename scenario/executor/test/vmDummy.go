@@ -99,7 +99,6 @@ func fillGasMapBaseOperationCosts(value uint64) map[string]uint64 {
 	gasMap["PersistPerByte"] = value
 	gasMap["CompilePerByte"] = value
 	gasMap["AoTPreparePerByte"] = value
-	gasMap["GetCode"] = value
 	return gasMap
 }
 
@@ -126,6 +125,11 @@ func fillGasMapBuiltInCosts(value uint64) map[string]uint64 {
 	gasMap["UnGuardAccount"] = value
 	gasMap["TrieLoadPerNode"] = value
 	gasMap["TrieStorePerNode"] = value
+	gasMap["ESDTModifyRoyalties"] = value
+	gasMap["ESDTModifyCreator"] = value
+	gasMap["ESDTNFTRecreate"] = value
+	gasMap["ESDTNFTUpdate"] = value
+	gasMap["ESDTNFTSetNewURIs"] = value
 
 	return gasMap
 }
