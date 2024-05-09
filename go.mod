@@ -6,7 +6,7 @@ require (
 	github.com/TwiN/go-color v1.1.0
 	github.com/multiversx/mx-chain-core-go v1.2.21-0.20240508071047-fefea5737840
 	github.com/multiversx/mx-chain-logger-go v1.0.15-0.20240508072523-3f00a726af57
-	github.com/multiversx/mx-chain-vm-common-go v1.5.13-0.20240508075445-ce4f1e544e54
+	github.com/multiversx/mx-chain-vm-common-go v1.5.13-0.20240509103544-247ce5639c7a
 	github.com/multiversx/mx-components-big-int v1.0.0
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.27.1
