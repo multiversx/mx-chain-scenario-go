@@ -10,6 +10,7 @@ import (
 	"github.com/multiversx/mx-chain-core-go/core"
 	"github.com/multiversx/mx-chain-core-go/data/vm"
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
+	worldmock "github.com/multiversx/mx-chain-scenario-go/worldmock"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
@@ -75,14 +76,6 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 		}
 
 		gasForExecution = tx.GasLimit.Value
-		if tx.ESDTValue != nil {
-			gasRemaining, err := ae.directESDTTransferFromTx(tx)
-			if err != nil {
-				return nil, err
-			}
-
-			gasForExecution = gasRemaining
-		}
 	}
 
 	// we also use fake vm outputs for transactions that don't use the VM, just for convenience
@@ -110,7 +103,7 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			gasForExecution = math.MaxInt64
 			fallthrough
 		case scenmodel.ScCall:
-			output, err = ae.scCall(txIndex, tx, gasForExecution)
+			output, err = ae.scCall(txIndex, tx, tx.GasLimit.Value)
 			if err != nil {
 				return nil, err
 			}
@@ -118,7 +111,14 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 				fmt.Println("\nIn txID:", txIndex, ", step type:ScCall, function:", tx.Function, ", total gas used:", gasForExecution-output.GasRemaining)
 			}
 		case scenmodel.Transfer:
-			output = ae.simpleTransferOutput(tx)
+			if tx.ESDTValue != nil {
+				output, err = ae.directESDTTransfer(tx)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				output = ae.simpleTransferOutput(tx)
+			}
 		case scenmodel.ValidatorReward:
 			output, err = ae.validatorRewardOutput(tx)
 			if err != nil {
@@ -256,49 +256,48 @@ func (ae *ScenarioExecutor) scCall(txIndex string, tx *scenmodel.Transaction, ga
 	if len(recipient.Code) == 0 {
 		return nil, fmt.Errorf("tx recipient (address: %s) is not a smart contract", hex.EncodeToString(tx.To.Value))
 	}
+
+	input := ConvertScenarioTxToVMInput(tx)
 	txHash := generateTxHash(txIndex)
-	vmInput := vmcommon.VMInput{
-		CallerAddr:     tx.From.Value,
-		Arguments:      scenmodel.JSONBytesFromTreeValues(tx.Arguments),
-		CallValue:      tx.EGLDValue.Value,
-		GasPrice:       tx.GasPrice.Value,
-		GasProvided:    gasLimit,
-		OriginalTxHash: txHash,
-		CurrentTxHash:  txHash,
-		ESDTTransfers:  make([]*vmcommon.ESDTTransfer, 0),
-	}
-	addESDTToVMInput(tx.ESDTValue, &vmInput)
-	input := &vmcommon.ContractCallInput{
-		RecipientAddr: tx.To.Value,
-		Function:      tx.Function,
-		VMInput:       vmInput,
+	input.CurrentTxHash = txHash
+	input.OriginalTxHash = txHash
+
+	if len(input.ESDTTransfers) > 0 {
+		bfInput := worldmock.ConvertToBuiltinFunction(input)
+		vmOutput, err := ae.World.BuiltinFuncs.ProcessBuiltInFunction(bfInput)
+		if err != nil {
+			return nil, err
+		}
+		if vmOutput.ReturnCode != vmcommon.Ok {
+			return nil, fmt.Errorf(
+				"%s failed: retcode = %d, msg = %s",
+				bfInput.Function,
+				vmOutput.ReturnCode,
+				vmOutput.ReturnMessage)
+		}
 	}
 
 	return ae.vm.RunSmartContractCall(input)
 }
 
-func (ae *ScenarioExecutor) directESDTTransferFromTx(tx *scenmodel.Transaction) (uint64, error) {
-	nrTransfers := len(tx.ESDTValue)
+func (ae *ScenarioExecutor) directESDTTransfer(tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
+	input := ConvertScenarioTxToVMInput(tx)
+	bfInput := worldmock.ConvertToBuiltinFunction(input)
+	vmOutput, err := ae.World.BuiltinFuncs.ProcessBuiltInFunction(bfInput)
 
-	if nrTransfers == 1 {
-		return ae.World.BuiltinFuncs.PerformDirectESDTTransfer(
-			tx.From.Value,
-			tx.To.Value,
-			tx.ESDTValue[0].TokenIdentifier.Value,
-			tx.ESDTValue[0].Nonce.Value,
-			tx.ESDTValue[0].Value.Value,
-			vm.DirectCall,
-			tx.GasLimit.Value,
-			tx.GasPrice.Value)
-	} else {
-		return ae.World.BuiltinFuncs.PerformDirectMultiESDTTransfer(
-			tx.From.Value,
-			tx.To.Value,
-			tx.ESDTValue,
-			vm.DirectCall,
-			tx.GasLimit.Value,
-			tx.GasPrice.Value)
+	if err != nil {
+		return nil, err
 	}
+
+	if vmOutput.ReturnCode != vmcommon.Ok {
+		return nil, fmt.Errorf(
+			"%s failed: retcode = %d, msg = %s",
+			bfInput.Function,
+			vmOutput.ReturnCode,
+			vmOutput.ReturnMessage)
+	}
+
+	return vmOutput, err
 }
 
 func (ae *ScenarioExecutor) updateStateAfterTx(
@@ -361,4 +360,24 @@ func addESDTToVMInput(esdtData []*scenmodel.ESDTTxData, vmInput *vmcommon.VMInpu
 			}
 		}
 	}
+}
+
+// ConvertScenarioTxToVMInput converts the scenario format to the VM input format.
+func ConvertScenarioTxToVMInput(tx *scenmodel.Transaction) *vmcommon.ContractCallInput {
+	input := &vmcommon.ContractCallInput{
+		VMInput: vmcommon.VMInput{
+			CallerAddr:  tx.From.Value,
+			Arguments:   scenmodel.JSONBytesFromTreeValues(tx.Arguments),
+			CallValue:   tx.EGLDValue.Value,
+			CallType:    vm.DirectCall,
+			GasPrice:    tx.GasPrice.Value,
+			GasProvided: tx.GasLimit.Value,
+			GasLocked:   0,
+		},
+		RecipientAddr:     tx.To.Value,
+		Function:          tx.Function,
+		AllowInitFunction: false,
+	}
+	addESDTToVMInput(tx.ESDTValue, &input.VMInput)
+	return input
 }
