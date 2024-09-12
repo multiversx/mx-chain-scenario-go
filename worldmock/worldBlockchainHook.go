@@ -129,6 +129,11 @@ func (b *MockWorld) GetStateRootHash() []byte {
 	return b.StateRootHash
 }
 
+// ChainID returns the chain ID
+func (b *MockWorld) ChainID() []byte {
+	return b.chainID
+}
+
 // CurrentNonce returns the nonce from the current block
 func (b *MockWorld) CurrentNonce() uint64 {
 	if b.CurrentBlockInfo == nil {

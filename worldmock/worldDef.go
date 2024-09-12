@@ -37,6 +37,7 @@ func (bi *BlockInfo) GetRandomSeedSlice() []byte {
 
 // MockWorld provides a mock representation of the blockchain to be used in VM tests.
 type MockWorld struct {
+	chainID                    []byte
 	SelfShardID                uint32
 	AcctMap                    AccountMap
 	AccountsAdapter            vmcommon.AccountsAdapter
@@ -62,6 +63,7 @@ type MockWorld struct {
 func NewMockWorld() *MockWorld {
 	accountMap := NewAccountMap()
 	world := &MockWorld{
+		chainID:             []byte{'c', 'h', 'a', 'i', 'n', 'I', 'D'},
 		SelfShardID:         0,
 		AcctMap:             accountMap,
 		AccountsAdapter:     nil,
