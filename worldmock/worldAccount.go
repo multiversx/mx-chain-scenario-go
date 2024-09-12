@@ -3,6 +3,8 @@ package worldmock
 import (
 	"bytes"
 	"errors"
+	"github.com/multiversx/mx-chain-core-go/core"
+	"github.com/multiversx/mx-chain-crypto-go/address"
 	"math/big"
 
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
@@ -33,6 +35,8 @@ type Account struct {
 	DeveloperReward *big.Int
 	ShardID         uint32
 	IsSmartContract bool
+	MainIdentifier  core.AddressIdentifier
+	Aliases         map[core.AddressIdentifier][]byte
 	MockWorld       *MockWorld
 }
 
@@ -263,6 +267,7 @@ func (a *Account) Clone() *Account {
 		DeveloperReward: big.NewInt(0).Set(a.DeveloperReward),
 		ShardID:         a.ShardID,
 		IsSmartContract: a.IsSmartContract,
+		Aliases:         a.Aliases,
 		MockWorld:       a.MockWorld,
 	}
 }
@@ -280,4 +285,57 @@ func cloneBytes(b []byte) []byte {
 	clone := make([]byte, len(b))
 	copy(clone, b)
 	return clone
+}
+
+// GetAlias -
+func (a *Account) GetAlias(identifier core.AddressIdentifier) []byte {
+	return a.Aliases[identifier]
+}
+
+// SetAlias -
+func (a *Account) SetAlias(aliasAddress []byte, aliasIdentifier core.AddressIdentifier) {
+	a.Aliases[aliasIdentifier] = aliasAddress
+	a.MockWorld.AliasesMap[aliasIdentifier.BuildAddressIdentifier(aliasAddress)] = a.Address
+}
+
+func (a *Account) RequestMainAddressIdentifier(request *vmcommon.AddressRequest) core.AddressIdentifier {
+	switch a.MainIdentifier {
+	case core.InvalidAddressIdentifier:
+		if request.SaveOnGenerate {
+			a.MainIdentifier = request.SourceIdentifier
+		}
+		return request.SourceIdentifier
+	default:
+		return a.MainIdentifier
+	}
+}
+
+func (a *Account) RequestMainAddress(request *vmcommon.AddressRequest) ([]byte, core.AddressIdentifier) {
+	mainAddressIdentifier := a.RequestMainAddressIdentifier(request)
+
+	switch mainAddressIdentifier {
+	case request.SourceIdentifier:
+		return request.SourceAddress, mainAddressIdentifier
+	case core.MVXAddressIdentifier:
+		return a.AddressBytes(), mainAddressIdentifier
+	default:
+		return a.GetAlias(mainAddressIdentifier), mainAddressIdentifier
+	}
+}
+
+func (a *Account) RequestAliasAddress(mainAddress []byte, mainAddressIdentifier core.AddressIdentifier, request *vmcommon.AddressRequest) ([]byte, error) {
+	aliasAddress := a.GetAlias(request.RequestedIdentifier)
+	if aliasAddress != nil {
+		return aliasAddress, nil
+	}
+
+	requestedAddress, err := address.GeneratePseudoAddress(mainAddress, mainAddressIdentifier, request.RequestedIdentifier)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.SaveOnGenerate {
+		a.SetAlias(requestedAddress, request.RequestedIdentifier)
+	}
+	return requestedAddress, nil
 }
