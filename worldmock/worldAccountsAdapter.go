@@ -163,6 +163,11 @@ func (m *MockAccountsAdapter) RequestAddress(request *vmcommon.AddressRequest) (
 		return nil, err
 	}
 
+	err = vmcommon.EnhanceAddressRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
 	return m.requestAddress(request)
 }
 
@@ -195,7 +200,7 @@ func (m *MockAccountsAdapter) loadWorldAccountForAlias(request *vmcommon.Address
 		return m.loadWorldAccount(multiversXAddress)
 	}
 
-	multiversXAddress, err := address.GeneratePseudoAddress(request.SourceAddress, request.SourceIdentifier, core.MVXAddressIdentifier)
+	multiversXAddress, err := m.generateMultiversXAddress(request)
 	if err != nil {
 		return nil, err
 	}
@@ -238,4 +243,11 @@ func (m *MockAccountsAdapter) requestAddress(request *vmcommon.AddressRequest) (
 		}
 		return &vmcommon.AddressResponse{MultiversXAddress: account.AddressBytes(), RequestedAddress: aliasAddress}, nil
 	}
+}
+
+func (m *MockAccountsAdapter) generateMultiversXAddress(request *vmcommon.AddressRequest) ([]byte, error) {
+	if vmcommon.IsBlankAddress(request.SourceAddress, request.SourceIdentifier) {
+		return vmcommon.RequestBlankAddress(core.MVXAddressIdentifier)
+	}
+	return address.GeneratePseudoAddress(request.SourceAddress, request.SourceIdentifier, core.MVXAddressIdentifier)
 }

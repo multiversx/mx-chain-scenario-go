@@ -329,7 +329,7 @@ func (a *Account) RequestAliasAddress(mainAddress []byte, mainAddressIdentifier 
 		return aliasAddress, nil
 	}
 
-	requestedAddress, err := address.GeneratePseudoAddress(mainAddress, mainAddressIdentifier, request.RequestedIdentifier)
+	requestedAddress, err := a.GenerateAliasAddress(mainAddress, mainAddressIdentifier, request)
 	if err != nil {
 		return nil, err
 	}
@@ -338,4 +338,11 @@ func (a *Account) RequestAliasAddress(mainAddress []byte, mainAddressIdentifier 
 		a.SetAlias(requestedAddress, request.RequestedIdentifier)
 	}
 	return requestedAddress, nil
+}
+
+func (a *Account) GenerateAliasAddress(mainAddress []byte, mainAddressIdentifier core.AddressIdentifier, request *vmcommon.AddressRequest) ([]byte, error) {
+	if vmcommon.IsBlankAddress(mainAddress, mainAddressIdentifier) {
+		return vmcommon.RequestBlankAddress(request.RequestedIdentifier)
+	}
+	return address.GeneratePseudoAddress(mainAddress, mainAddressIdentifier, request.RequestedIdentifier)
 }
