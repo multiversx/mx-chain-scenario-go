@@ -126,6 +126,11 @@ func fillGasMapBuiltInCosts(value uint64) map[string]uint64 {
 	gasMap["UnGuardAccount"] = value
 	gasMap["TrieLoadPerNode"] = value
 	gasMap["TrieStorePerNode"] = value
+	gasMap["ESDTModifyRoyalties"] = value
+	gasMap["ESDTModifyCreator"] = value
+	gasMap["ESDTNFTRecreate"] = value
+	gasMap["ESDTNFTUpdate"] = value
+	gasMap["ESDTNFTSetNewURIs"] = value
 
 	return gasMap
 }
