@@ -173,3 +173,19 @@ func (b *MockWorld) ExecuteSmartContractCallOnOtherVM(input *vmcommon.ContractCa
 
 	return vmOutput, nil
 }
+
+func (b *MockWorld) EpochStartBlockNonce() uint64 {
+	return 0
+}
+
+func (b *MockWorld) EpochStartBlockRound() uint64 {
+	return 0
+}
+
+func (b *MockWorld) EpochStartBlockTimeStamp() uint64 {
+	return 0
+}
+
+func (b *MockWorld) RoundTime() uint64 {
+	return 0
+}
