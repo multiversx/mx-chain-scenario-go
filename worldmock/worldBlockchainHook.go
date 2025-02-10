@@ -305,3 +305,39 @@ func (b *MockWorld) IsLimitedTransfer(_ []byte) bool {
 func (b *MockWorld) IsInterfaceNil() bool {
 	return b == nil
 }
+
+// EpochStartBlockNonce -
+func (b *MockWorld) EpochStartBlockNonce() uint64 {
+	if b.ProvidedBlockchainHook != nil {
+		return b.ProvidedBlockchainHook.EpochStartBlockNonce()
+	}
+
+	return 0
+}
+
+// EpochStartBlockRound -
+func (b *MockWorld) EpochStartBlockRound() uint64 {
+	if b.ProvidedBlockchainHook != nil {
+		return b.ProvidedBlockchainHook.EpochStartBlockNonce()
+	}
+
+	return 0
+}
+
+// EpochStartBlockTimeStamp -
+func (b *MockWorld) EpochStartBlockTimeStamp() uint64 {
+	if b.ProvidedBlockchainHook != nil {
+		return b.ProvidedBlockchainHook.EpochStartBlockTimeStamp()
+	}
+
+	return 0
+}
+
+// RoundTime -
+func (b *MockWorld) RoundTime() uint64 {
+	if b.ProvidedBlockchainHook != nil {
+		return b.ProvidedBlockchainHook.RoundTime()
+	}
+
+	return 0
+}
