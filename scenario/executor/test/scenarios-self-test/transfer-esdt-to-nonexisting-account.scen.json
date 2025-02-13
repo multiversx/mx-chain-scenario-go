@@ -1,5 +1,5 @@
 {
-    "comment": "simple ESDT transfer, no SC",
+    "comment": "simple ESDT transfer to nonexistent account, no SC",
     "steps": [
         {
             "step": "setState",
