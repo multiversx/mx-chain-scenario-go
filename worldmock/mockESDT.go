@@ -1,6 +1,7 @@
 package worldmock
 
 import (
+	"bytes"
 	"fmt"
 	"math/big"
 
@@ -12,6 +13,8 @@ import (
 	"github.com/multiversx/mx-chain-scenario-go/worldmock/esdtconvert"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
+
+var EGLD_000000_TOKEN_IDENTIFIER = []byte{'E', 'G', 'L', 'D', '-', '0', '0', '0', '0', '0', '0'}
 
 // GetTokenBalance returns the ESDT balance of an account for the given token
 // key (token keys are built from the token identifier using MakeTokenKey).
@@ -52,14 +55,16 @@ func (bf *BuiltinFunctionsWrapper) SetTokenData(address []byte, tokenIdentifier 
 
 // ConvertToBuiltinFunction converts a VM input with a populated ESDT field into a built-in function call.
 func ConvertToBuiltinFunction(tx *vmcommon.ContractCallInput) *vmcommon.ContractCallInput {
-	switch len(tx.ESDTTransfers) {
-	case 0:
+	if len(tx.ESDTTransfers) == 0 {
 		return tx
-	case 1:
-		return convertToESDTTransfer(tx, tx.ESDTTransfers[0])
-	default:
-		return convertToMultiESDTTransfer(tx)
 	}
+
+	if len(tx.ESDTTransfers) == 1 && !bytes.Equal(tx.ESDTTransfers[0].ESDTTokenName, EGLD_000000_TOKEN_IDENTIFIER) {
+		return convertToESDTTransfer(tx, tx.ESDTTransfers[0])
+
+	}
+
+	return convertToMultiESDTTransfer(tx)
 }
 
 func convertToESDTTransfer(tx *vmcommon.ContractCallInput, esdtTransfer *vmcommon.ESDTTransfer) *vmcommon.ContractCallInput {
