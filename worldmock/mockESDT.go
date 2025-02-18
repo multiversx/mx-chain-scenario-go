@@ -14,7 +14,7 @@ import (
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
-var EGLD_000000_TOKEN_IDENTIFIER = []byte{'E', 'G', 'L', 'D', '-', '0', '0', '0', '0', '0', '0'}
+var EGLD_000000_TOKEN_IDENTIFIER = []byte("EGLD-000000")
 
 // GetTokenBalance returns the ESDT balance of an account for the given token
 // key (token keys are built from the token identifier using MakeTokenKey).
