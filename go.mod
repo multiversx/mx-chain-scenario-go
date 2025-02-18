@@ -1,13 +1,13 @@
 module github.com/multiversx/mx-chain-scenario-go
 
-go 1.20
+go 1.23
 
 require (
 	github.com/TwiN/go-color v1.1.0
-	github.com/multiversx/mx-chain-core-go v1.2.22
-	github.com/multiversx/mx-chain-logger-go v1.0.15
-	github.com/multiversx/mx-chain-vm-common-go v1.5.17-0.20241021074004-c2bdb78da54a
-	github.com/multiversx/mx-components-big-int v1.0.0
+	github.com/multiversx/mx-chain-core-go v1.2.25-0.20250218161123-121084ae9840
+	github.com/multiversx/mx-chain-logger-go v1.0.16-0.20250218161408-6a0c19d0da48
+	github.com/multiversx/mx-chain-vm-common-go v1.5.17-0.20250218162215-88938774627c
+	github.com/multiversx/mx-components-big-int v1.0.1-0.20250218162530-b4e4d7442408
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.27.1
 	golang.org/x/crypto v0.3.0
