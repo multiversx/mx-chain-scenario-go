@@ -145,6 +145,38 @@ func (b *MockWorld) CurrentRound() uint64 {
 	return b.CurrentBlockInfo.BlockRound
 }
 
+// RoundTime returns the duration of a round
+func (b *MockWorld) RoundTime() uint64 {
+	return 0
+}
+
+// EpochStartBlockTimeStamp returns the timestamp of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockTimeStamp() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return b.CurrentBlockInfo.BlockTimestamp
+}
+
+// EpochStartBlockNonce returns the nonce of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockNonce() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return b.CurrentBlockInfo.BlockNonce
+}
+
+// EpochStartBlockRound returns the round of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockRound() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return b.CurrentBlockInfo.BlockRound
+}
+
 // CurrentTimeStamp return the timestamp from the current block
 func (b *MockWorld) CurrentTimeStamp() uint64 {
 	if b.CurrentBlockInfo == nil {
