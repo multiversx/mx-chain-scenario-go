@@ -70,10 +70,20 @@ func NewBuiltinFunctionsWrapper(
 	return builtinFuncsWrapper, nil
 }
 
+func (bf *BuiltinFunctionsWrapper) ensureAccountExists(address []byte) vmcommon.UserAccountHandler {
+	account := bf.World.AcctMap.GetAccount(address)
+	if account == nil {
+		account = bf.World.AcctMap.CreateAccount(address, bf.World)
+	}
+	return account
+}
+
 // ProcessBuiltInFunction delegates the execution of a real builtin function to
 // the inner BuiltInFunctionContainer.
 func (bf *BuiltinFunctionsWrapper) ProcessBuiltInFunction(input *vmcommon.ContractCallInput) (*vmcommon.VMOutput, error) {
 	caller := bf.getAccountSharded(input.CallerAddr)
+
+	_ = bf.ensureAccountExists(input.RecipientAddr)
 	recipient := bf.getAccountSharded(input.RecipientAddr)
 
 	function, err := bf.Container.Get(input.Function)

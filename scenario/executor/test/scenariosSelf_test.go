@@ -207,3 +207,11 @@ func TestScenariosEsdtNonZeroBalance(t *testing.T) {
 			`Check state "check-1": mismatch for account "address:B":
   for token: TOK-123456, nonce: 0: Bad balance. Want: "100". Have: "0"`)
 }
+
+func TestScenariosTransferEsdtToNonexistingAccount(t *testing.T) {
+	ScenariosTest(t).
+		Folder("scenarios-self-test").
+		File("transfer-esdt-to-nonexisting-account.scen.json").
+		Run().
+		CheckNoError()
+}
