@@ -44,6 +44,9 @@ func NewBuiltinFunctionsWrapper(
 		EnableEpochsHandler:              world.EnableEpochsHandler,
 		GuardedAccountHandler:            world.GuardedAccountHandler,
 		MaxNumOfAddressesForTransferRole: 100,
+		MapWhiteListedCrossChainAddresses: map[string]struct{}{
+			"whiteListedAddress": {},
+		},
 	}
 
 	builtinFuncFactory, err := builtInFunctions.NewBuiltInFunctionsCreator(argsBuiltIn)
