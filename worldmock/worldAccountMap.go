@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/hex"
 	"fmt"
+	"github.com/multiversx/mx-chain-core-go/core"
 	"math/big"
 
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
@@ -32,6 +33,7 @@ func (am AccountMap) CreateAccount(address []byte, world *MockWorld) *Account {
 		ShardID:         0,
 		IsSmartContract: false,
 		DeveloperReward: big.NewInt(0),
+		Aliases:         make(map[core.AddressIdentifier][]byte),
 		MockWorld:       world,
 	}
 	copy(newAccount.Address, address)
