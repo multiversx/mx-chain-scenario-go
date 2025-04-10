@@ -2,10 +2,15 @@ module github.com/multiversx/mx-chain-scenario-go
 
 go 1.20
 
+replace (
+	github.com/multiversx/mx-chain-core-go => github.com/multiversx/mx-chain-core-sovereign-go v1.2.25-0.20250410112225-9b4402144b11
+	github.com/multiversx/mx-chain-vm-common-go => github.com/multiversx/mx-chain-vm-common-sovereign-go v1.5.17-0.20250410122840-746d3522fe41
+)
+
 require (
 	github.com/TwiN/go-color v1.1.0
 	github.com/multiversx/mx-chain-core-go v1.2.24-0.20241119082458-e2451e147ab1
-	github.com/multiversx/mx-chain-crypto-go v0.0.0-00010101000000-000000000000
+	github.com/multiversx/mx-chain-crypto-go v1.2.13-0.20250410124744-d21d37be8e32
 	github.com/multiversx/mx-chain-logger-go v1.0.15
 	github.com/multiversx/mx-chain-vm-common-go v1.5.13
 	github.com/multiversx/mx-components-big-int v1.0.0
@@ -37,11 +42,3 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/multiversx/mx-chain-core-go => github.com/multiversx/mx-chain-core-sovereign-go v1.2.25-0.20250410112225-9b4402144b11
-
-replace github.com/multiversx/mx-sdk-abi-go => github.com/multiversx/mx-sdk-abi-go v0.3.1-0.20240912062928-8502f4c3b37c
-
-replace github.com/multiversx/mx-chain-crypto-go => github.com/multiversx/mx-chain-crypto-go v1.2.13-0.20250410114129-6c7b360d3b65
-
-replace github.com/multiversx/mx-chain-vm-common-go => github.com/multiversx/mx-chain-vm-common-sovereign-go v1.5.17-0.20250410122840-746d3522fe41
