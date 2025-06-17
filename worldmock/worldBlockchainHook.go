@@ -19,6 +19,11 @@ var ErrBuiltinFuncWrapperNotInitialized = errors.New("builtin function not found
 
 var zero = big.NewInt(0)
 
+func ConvertTimeStampSecToMs(timeStamp uint64) uint64 {
+	return timeStamp * 1000 // Convert seconds to milliseconds
+
+}
+
 // NewAddress provides the address for a new account.
 // It looks up the explicit new address mocks, if none found generates one using a fake but realistic algorithm.
 func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, vmType []byte) ([]byte, error) {
@@ -106,6 +111,28 @@ func (b *MockWorld) LastTimeStamp() uint64 {
 		return 0
 	}
 	return b.PreviousBlockInfo.BlockTimestamp
+}
+
+func (b *MockWorld) LastTimeStampMs() uint64 {
+	if b.PreviousBlockInfo == nil {
+		return 0
+	}
+	return ConvertTimeStampSecToMs(b.PreviousBlockInfo.BlockTimestamp)
+}
+
+func (b *MockWorld) CurrentTimeStampMs() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+	return ConvertTimeStampSecToMs(b.CurrentBlockInfo.BlockTimestamp)
+}
+
+func (b *MockWorld) EpochStartBlockTimeStampMs() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return ConvertTimeStampSecToMs(b.CurrentBlockInfo.BlockTimestamp)
 }
 
 // LastRandomSeed returns the random seed from the last committed block
