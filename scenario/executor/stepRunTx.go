@@ -46,9 +46,25 @@ func (ae *ScenarioExecutor) ExecuteTxStep(step *scenmodel.TxStep) (*vmcommon.VMO
 }
 
 func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction) (*vmcommon.VMOutput, error) {
+	var err error
+	gasForExecution := uint64(0)
+
+	// use gas (before snaphot)
+	if tx.Type.HasSender() {
+		beforeErr := ae.World.UpdateWorldStateBefore(
+			tx.From.Value,
+			tx.GasLimit.Value,
+			tx.GasPrice.Value)
+		if beforeErr != nil {
+			err = fmt.Errorf("could not set up tx %s: %w", txIndex, beforeErr)
+			return nil, err
+		}
+
+		gasForExecution = tx.GasLimit.Value
+	}
+
 	ae.World.CreateStateBackup()
 
-	var err error
 	defer func() {
 		if err != nil {
 			errRollback := ae.World.RollbackChanges()
@@ -62,21 +78,6 @@ func (ae *ScenarioExecutor) executeTx(txIndex string, tx *scenmodel.Transaction)
 			}
 		}
 	}()
-
-	gasForExecution := uint64(0)
-
-	if tx.Type.HasSender() {
-		beforeErr := ae.World.UpdateWorldStateBefore(
-			tx.From.Value,
-			tx.GasLimit.Value,
-			tx.GasPrice.Value)
-		if beforeErr != nil {
-			err = fmt.Errorf("could not set up tx %s: %w", txIndex, beforeErr)
-			return nil, err
-		}
-
-		gasForExecution = tx.GasLimit.Value
-	}
 
 	// we also use fake vm outputs for transactions that don't use the VM, just for convenience
 	var output *vmcommon.VMOutput
