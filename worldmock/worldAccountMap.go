@@ -127,6 +127,7 @@ func (am AccountMap) LoadAccountStorageFrom(otherAM AccountMap) error {
 				hex.EncodeToString([]byte(address)))
 		}
 		account.Storage = otherAccount.Storage
+		account.Balance = big.NewInt(0).Set(otherAccount.Balance)
 	}
 
 	return nil
