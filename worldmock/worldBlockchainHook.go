@@ -19,6 +19,12 @@ var ErrBuiltinFuncWrapperNotInitialized = errors.New("builtin function not found
 
 var zero = big.NewInt(0)
 
+// ConvertTimeStampSecToMs converts a timestamp from seconds to milliseconds.
+func ConvertTimeStampSecToMs(timeStamp uint64) uint64 {
+	return timeStamp * 1000 // Convert seconds to milliseconds
+
+}
+
 // NewAddress provides the address for a new account.
 // It looks up the explicit new address mocks, if none found generates one using a fake but realistic algorithm.
 func (b *MockWorld) NewAddress(creatorAddress []byte, creatorNonce uint64, vmType []byte) ([]byte, error) {
@@ -108,6 +114,31 @@ func (b *MockWorld) LastTimeStamp() uint64 {
 	return b.PreviousBlockInfo.BlockTimestamp
 }
 
+// LastTimeStampMs returns the timeStamp in milliseconds from the last committed block
+func (b *MockWorld) LastTimeStampMs() uint64 {
+	if b.PreviousBlockInfo == nil {
+		return 0
+	}
+	return ConvertTimeStampSecToMs(b.PreviousBlockInfo.BlockTimestamp)
+}
+
+// CurrentTimeStampMs returns the timestamp in milliseconds from the current block
+func (b *MockWorld) CurrentTimeStampMs() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+	return ConvertTimeStampSecToMs(b.CurrentBlockInfo.BlockTimestamp)
+}
+
+// EpochStartBlockTimeStampMs returns the timestamp in milliseconds of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockTimeStampMs() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return ConvertTimeStampSecToMs(b.CurrentBlockInfo.BlockTimestamp)
+}
+
 // LastRandomSeed returns the random seed from the last committed block
 func (b *MockWorld) LastRandomSeed() []byte {
 	if b.PreviousBlockInfo == nil {
@@ -142,6 +173,38 @@ func (b *MockWorld) CurrentRound() uint64 {
 	if b.CurrentBlockInfo == nil {
 		return 0
 	}
+	return b.CurrentBlockInfo.BlockRound
+}
+
+// RoundTime returns the duration of a round
+func (b *MockWorld) RoundTime() uint64 {
+	return 0
+}
+
+// EpochStartBlockTimeStamp returns the timestamp of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockTimeStamp() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return b.CurrentBlockInfo.BlockTimestamp
+}
+
+// EpochStartBlockNonce returns the nonce of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockNonce() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
+	return b.CurrentBlockInfo.BlockNonce
+}
+
+// EpochStartBlockRound returns the round of the first block of the current epoch
+func (b *MockWorld) EpochStartBlockRound() uint64 {
+	if b.CurrentBlockInfo == nil {
+		return 0
+	}
+
 	return b.CurrentBlockInfo.BlockRound
 }
 
