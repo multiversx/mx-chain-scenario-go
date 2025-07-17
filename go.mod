@@ -4,10 +4,10 @@ go 1.23
 
 require (
 	github.com/TwiN/go-color v1.1.0
-	github.com/multiversx/mx-chain-core-go v1.3.2-0.20250520074139-18b645ad397a
-	github.com/multiversx/mx-chain-logger-go v1.0.16-0.20250520074859-b2faf3c90273
-	github.com/multiversx/mx-chain-vm-common-go v1.5.17-0.20250604100541-1efc3d1b1314
-	github.com/multiversx/mx-components-big-int v1.0.1-0.20250218162530-b4e4d7442408
+	github.com/multiversx/mx-chain-core-go v1.4.0
+	github.com/multiversx/mx-chain-logger-go v1.1.0
+	github.com/multiversx/mx-chain-vm-common-go v1.6.0
+	github.com/multiversx/mx-components-big-int v1.1.0
 	github.com/stretchr/testify v1.8.1
 	github.com/urfave/cli/v2 v2.27.1
 	golang.org/x/crypto v0.3.0
