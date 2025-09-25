@@ -19,11 +19,11 @@ type NewAddressMock struct {
 
 // BlockInfo contains metadata about a mocked block
 type BlockInfo struct {
-	BlockTimestamp uint64
-	BlockNonce     uint64
-	BlockRound     uint64
-	BlockEpoch     uint32
-	RandomSeed     *[48]byte
+	BlockTimestampMs uint64
+	BlockNonce       uint64
+	BlockRound       uint64
+	BlockEpoch       uint32
+	RandomSeed       *[48]byte
 }
 
 // GetRandomSeedSlice retrieves the configured random seed or a slice of zeros.
