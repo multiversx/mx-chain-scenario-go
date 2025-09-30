@@ -23,6 +23,11 @@ func (p *Parser) processBlockInfo(blockInfoRaw oj.OJsonObject) (*scenmodel.Block
 			if err != nil {
 				return nil, fmt.Errorf("error parsing blockTimestamp: %w", err)
 			}
+		case "blockTimestampMs":
+			blockInfo.BlockTimestampMs, err = p.processUint64(kvp.Value)
+			if err != nil {
+				return nil, fmt.Errorf("error parsing blockTimestampMs: %w", err)
+			}
 		case "blockNonce":
 			blockInfo.BlockNonce, err = p.processUint64(kvp.Value)
 			if err != nil {

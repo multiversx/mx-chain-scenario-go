@@ -191,17 +191,19 @@ func convertBlockInfo(testBlockInfo *scenmodel.BlockInfo, currentInfo *worldmock
 
 	if currentInfo == nil {
 		currentInfo = &worldmock.BlockInfo{
-			BlockTimestamp: 0,
-			BlockNonce:     0,
-			BlockRound:     0,
-			BlockEpoch:     0,
-			RandomSeed:     nil,
+			BlockTimestampMs: 0,
+			BlockNonce:       0,
+			BlockRound:       0,
+			BlockEpoch:       0,
+			RandomSeed:       nil,
 		}
 	}
 
-	if !testBlockInfo.BlockTimestamp.OriginalEmpty() {
-		currentInfo.BlockTimestamp = testBlockInfo.BlockTimestamp.Value
-
+	if !testBlockInfo.BlockTimestampMs.OriginalEmpty() {
+		currentInfo.BlockTimestampMs = testBlockInfo.BlockTimestampMs.Value
+	} else if !testBlockInfo.BlockTimestamp.OriginalEmpty() {
+		// backwards compatibility
+		currentInfo.BlockTimestampMs = testBlockInfo.BlockTimestamp.Value * 1000
 	}
 
 	if !testBlockInfo.BlockNonce.OriginalEmpty() {

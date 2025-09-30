@@ -167,6 +167,9 @@ func blockInfoToOJ(blockInfo *scenmodel.BlockInfo) oj.OJsonObject {
 	if len(blockInfo.BlockTimestamp.Original) > 0 {
 		blockInfoOJ.Put("blockTimestamp", uint64ToOJ(blockInfo.BlockTimestamp))
 	}
+	if len(blockInfo.BlockTimestampMs.Original) > 0 {
+		blockInfoOJ.Put("blockTimestampMs", uint64ToOJ(blockInfo.BlockTimestampMs))
+	}
 	if len(blockInfo.BlockNonce.Original) > 0 {
 		blockInfoOJ.Put("blockNonce", uint64ToOJ(blockInfo.BlockNonce))
 	}
