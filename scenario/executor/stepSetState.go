@@ -3,6 +3,7 @@ package scenexec
 import (
 	"errors"
 	"fmt"
+	"github.com/multiversx/mx-chain-core-go/core"
 	"math/big"
 
 	scenmodel "github.com/multiversx/mx-chain-scenario-go/scenario/model"
@@ -144,6 +145,7 @@ func convertAccount(testAcct *scenmodel.Account, world *worldmock.MockWorld) (*w
 		AsyncCallData:   testAcct.AsyncCallData,
 		ShardID:         uint32(testAcct.Shard.Value),
 		IsSmartContract: len(testAcct.Code.Value) > 0,
+		Aliases:         make(map[core.AddressIdentifier][]byte),
 		MockWorld:       world,
 	}
 

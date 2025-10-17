@@ -5,7 +5,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
+	"github.com/multiversx/mx-chain-core-go/core"
+	"github.com/multiversx/mx-chain-crypto-go/address"
 	vmcommon "github.com/multiversx/mx-chain-vm-common-go"
 )
 
@@ -145,7 +146,108 @@ func (m *MockAccountsAdapter) IsPruningEnabled() bool {
 	return false
 }
 
+// SaveAliasAddress -
+func (m *MockAccountsAdapter) SaveAliasAddress(request *vmcommon.AliasSaveRequest) error {
+	err := vmcommon.ValidateAliasSaveRequest(request)
+	if err != nil {
+		return err
+	}
+
+	return m.saveAliasAddress(request)
+}
+
+// RequestAddress -
+func (m *MockAccountsAdapter) RequestAddress(request *vmcommon.AddressRequest) (*vmcommon.AddressResponse, error) {
+	err := vmcommon.ValidateAddressRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	err = vmcommon.EnhanceAddressRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	return m.requestAddress(request)
+}
+
 // IsInterfaceNil -
 func (m *MockAccountsAdapter) IsInterfaceNil() bool {
 	return m == nil
+}
+
+func (m *MockAccountsAdapter) loadWorldAccount(address []byte) (*Account, error) {
+	account, err := m.LoadAccount(address)
+	if err != nil {
+		return nil, err
+	}
+	return account.(*Account), nil
+}
+
+func (m *MockAccountsAdapter) saveAliasAddress(request *vmcommon.AliasSaveRequest) error {
+	account, err := m.loadWorldAccount(request.MultiversXAddress)
+	if err != nil {
+		return err
+	}
+
+	account.SetAlias(request.AliasAddress, request.AliasIdentifier)
+	return nil
+}
+
+func (m *MockAccountsAdapter) loadWorldAccountForAlias(request *vmcommon.AddressRequest) (*Account, error) {
+	multiversXAddress, exists := m.World.AliasesMap[request.SourceIdentifier.BuildAddressIdentifier(request.SourceAddress)]
+	if exists {
+		return m.loadWorldAccount(multiversXAddress)
+	}
+
+	multiversXAddress, err := m.generateMultiversXAddress(request)
+	if err != nil {
+		return nil, err
+	}
+
+	account, err := m.loadWorldAccount(multiversXAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	if request.SaveOnGenerate {
+		account.SetAlias(request.SourceAddress, request.SourceIdentifier)
+	}
+	return account, nil
+}
+
+func (m *MockAccountsAdapter) loadAccountHandlerForRequest(request *vmcommon.AddressRequest) (*Account, error) {
+	switch request.SourceIdentifier {
+	case core.MVXAddressIdentifier:
+		return m.loadWorldAccount(request.SourceAddress)
+	default:
+		return m.loadWorldAccountForAlias(request)
+	}
+}
+
+func (m *MockAccountsAdapter) requestAddress(request *vmcommon.AddressRequest) (*vmcommon.AddressResponse, error) {
+	account, err := m.loadAccountHandlerForRequest(request)
+	if err != nil {
+		return nil, err
+	}
+
+	mainAddress, mainAddressIdentifier := account.RequestMainAddress(request)
+
+	switch request.RequestedIdentifier {
+	case core.MVXAddressIdentifier:
+		return &vmcommon.AddressResponse{MultiversXAddress: account.AddressBytes(), RequestedAddress: account.AddressBytes()}, nil
+	default:
+		aliasAddress, aliasErr := account.RequestAliasAddress(mainAddress, mainAddressIdentifier, request)
+		if aliasErr != nil {
+			return nil, aliasErr
+		}
+		return &vmcommon.AddressResponse{MultiversXAddress: account.AddressBytes(), RequestedAddress: aliasAddress}, nil
+	}
+}
+
+func (m *MockAccountsAdapter) generateMultiversXAddress(request *vmcommon.AddressRequest) ([]byte, error) {
+	if vmcommon.IsBlankAddress(request.SourceAddress, request.SourceIdentifier) {
+		return vmcommon.RequestBlankAddress(core.MVXAddressIdentifier)
+	}
+	return address.GeneratePseudoAddress(request.SourceAddress, request.SourceIdentifier, core.MVXAddressIdentifier)
 }

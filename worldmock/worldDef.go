@@ -37,6 +37,7 @@ func (bi *BlockInfo) GetRandomSeedSlice() []byte {
 
 // MockWorld provides a mock representation of the blockchain to be used in VM tests.
 type MockWorld struct {
+	chainID                    []byte
 	SelfShardID                uint32
 	AcctMap                    AccountMap
 	AccountsAdapter            vmcommon.AccountsAdapter
@@ -55,12 +56,14 @@ type MockWorld struct {
 	ProvidedBlockchainHook     vmcommon.BlockchainHook
 	EnableEpochsHandler        vmcommon.EnableEpochsHandler
 	OtherVMOutputMap           map[string]*vmcommon.VMOutput
+	AliasesMap                 map[string][]byte
 }
 
 // NewMockWorld creates a new MockWorld instance
 func NewMockWorld() *MockWorld {
 	accountMap := NewAccountMap()
 	world := &MockWorld{
+		chainID:             []byte{'c', 'h', 'a', 'i', 'n', 'I', 'D'},
 		SelfShardID:         0,
 		AcctMap:             accountMap,
 		AccountsAdapter:     nil,
@@ -72,6 +75,7 @@ func NewMockWorld() *MockWorld {
 		BuiltinFuncs:        nil,
 		EnableEpochsHandler: EnableEpochsHandlerStubAllFlags(),
 		OtherVMOutputMap:    make(map[string]*vmcommon.VMOutput),
+		AliasesMap:          make(map[string][]byte),
 	}
 	world.AccountsAdapter = NewMockAccountsAdapter(world)
 	world.GuardedAccountHandler = NewMockGuardedAccountHandler()
@@ -172,4 +176,14 @@ func (b *MockWorld) ExecuteSmartContractCallOnOtherVM(input *vmcommon.ContractCa
 	}
 
 	return vmOutput, nil
+}
+
+// SaveAliasAddress -
+func (b *MockWorld) SaveAliasAddress(request *vmcommon.AliasSaveRequest) error {
+	return b.AccountsAdapter.SaveAliasAddress(request)
+}
+
+// RequestAddress -
+func (b *MockWorld) RequestAddress(request *vmcommon.AddressRequest) (*vmcommon.AddressResponse, error) {
+	return b.AccountsAdapter.RequestAddress(request)
 }
