@@ -25,6 +25,12 @@ type BuiltinFunctionsWrapper struct {
 	Marshalizer     vmcommon.Marshalizer
 }
 
+func getWhiteListedAddress() map[string]struct{} {
+	return map[string]struct{}{
+		"whiteListedAddress": {},
+	}
+}
+
 // NewBuiltinFunctionsWrapper creates a new BuiltinFunctionsWrapper with
 // default dependencies.
 func NewBuiltinFunctionsWrapper(
@@ -35,15 +41,16 @@ func NewBuiltinFunctionsWrapper(
 	dnsMap := makeDNSAddresses(numDNSAddresses)
 
 	argsBuiltIn := builtInFunctions.ArgsCreateBuiltInFunctionContainer{
-		GasMap:                           gasMap,
-		MapDNSAddresses:                  dnsMap,
-		MapDNSV2Addresses:                dnsMap,
-		Marshalizer:                      WorldMarshalizer,
-		Accounts:                         world.AccountsAdapter,
-		ShardCoordinator:                 world,
-		EnableEpochsHandler:              world.EnableEpochsHandler,
-		GuardedAccountHandler:            world.GuardedAccountHandler,
-		MaxNumOfAddressesForTransferRole: 100,
+		GasMap:                            gasMap,
+		MapDNSAddresses:                   dnsMap,
+		MapDNSV2Addresses:                 dnsMap,
+		Marshalizer:                       WorldMarshalizer,
+		Accounts:                          world.AccountsAdapter,
+		ShardCoordinator:                  world,
+		EnableEpochsHandler:               world.EnableEpochsHandler,
+		GuardedAccountHandler:             world.GuardedAccountHandler,
+		MaxNumOfAddressesForTransferRole:  100,
+		MapWhiteListedCrossChainAddresses: getWhiteListedAddress(),
 	}
 
 	builtinFuncFactory, err := builtInFunctions.NewBuiltInFunctionsCreator(argsBuiltIn)

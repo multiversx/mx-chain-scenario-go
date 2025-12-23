@@ -50,7 +50,7 @@ func (b *MockWorld) UpdateWorldStateBefore(
 
 // UpdateAccounts should be called after the VM test has run, to update world state
 func (b *MockWorld) UpdateAccounts(
-	outputAccounts map[string]*vmcommon.OutputAccount,
+	outputAccounts map[string]vmcommon.OutputAccountHandler,
 	accountsToDelete [][]byte) error {
 
 	for _, modAcct := range outputAccounts {
@@ -65,31 +65,31 @@ func (b *MockWorld) UpdateAccounts(
 }
 
 // UpdateAccountFromOutputAccount updates a single account from a transaction output.
-func (b *MockWorld) UpdateAccountFromOutputAccount(modAcct *vmcommon.OutputAccount) {
-	acct := b.AcctMap.GetAccount(modAcct.Address)
+func (b *MockWorld) UpdateAccountFromOutputAccount(modAcct vmcommon.OutputAccountHandler) {
+	acct := b.AcctMap.GetAccount(modAcct.GetAddress())
 	if acct == nil {
-		acct = b.AcctMap.CreateAccount(modAcct.Address, b)
-		acct.OwnerAddress = modAcct.CodeDeployerAddress
+		acct = b.AcctMap.CreateAccount(modAcct.GetAddress(), b)
+		acct.OwnerAddress = modAcct.GetCodeDeployerAddress()
 		b.AcctMap.PutAccount(acct)
 	}
 	acct.Exists = true
-	if modAcct.BalanceDelta != nil {
-		acct.Balance = big.NewInt(0).Add(acct.Balance, modAcct.BalanceDelta)
+	if modAcct.GetBalanceDelta() != nil {
+		acct.Balance = big.NewInt(0).Add(acct.Balance, modAcct.GetBalanceDelta())
 	} else {
-		acct.Balance = modAcct.Balance
+		acct.Balance = modAcct.GetBalance()
 	}
-	if modAcct.Nonce > acct.Nonce {
-		acct.Nonce = modAcct.Nonce
+	if modAcct.GetNonce() > acct.Nonce {
+		acct.Nonce = modAcct.GetNonce()
 	}
-	if len(modAcct.Code) > 0 {
-		codeMetadata := vmcommon.CodeMetadataFromBytes(modAcct.CodeMetadata)
-		acct.SetCodeAndMetadata(modAcct.Code, &codeMetadata)
+	if len(modAcct.GetCode()) > 0 {
+		codeMetadata := vmcommon.CodeMetadataFromBytes(modAcct.GetCodeMetadata())
+		acct.SetCodeAndMetadata(modAcct.GetCode(), &codeMetadata)
 	}
-	if len(modAcct.OutputTransfers) > 0 && len(modAcct.OutputTransfers[0].Data) > 0 {
-		acct.AsyncCallData = string(modAcct.OutputTransfers[0].Data)
+	if len(modAcct.GetOutputTransfers()) > 0 && len(modAcct.GetOutputTransfers()[0].Data) > 0 {
+		acct.AsyncCallData = string(modAcct.GetOutputTransfers()[0].Data)
 	}
 
-	for _, stu := range modAcct.StorageUpdates {
+	for _, stu := range modAcct.GetStorageUpdates() {
 		acct.Storage[string(stu.Offset)] = stu.Data
 	}
 }

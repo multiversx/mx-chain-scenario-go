@@ -153,7 +153,7 @@ func (ae *ScenarioExecutor) senderHasEnoughBalance(tx *scenmodel.Transaction) bo
 }
 
 func (ae *ScenarioExecutor) simpleTransferOutput(tx *scenmodel.Transaction) *vmcommon.VMOutput {
-	outputAccounts := make(map[string]*vmcommon.OutputAccount)
+	outputAccounts := make(map[string]vmcommon.OutputAccountHandler)
 	outputAccounts[string(tx.To.Value)] = &vmcommon.OutputAccount{
 		Address:      tx.To.Value,
 		BalanceDelta: tx.EGLDValue.Value,
@@ -184,7 +184,7 @@ func (ae *ScenarioExecutor) validatorRewardOutput(tx *scenmodel.Transaction) (*v
 		big.NewInt(0).SetBytes(storageReward),
 		reward).Bytes()
 
-	outputAccounts := make(map[string]*vmcommon.OutputAccount)
+	outputAccounts := make(map[string]vmcommon.OutputAccountHandler)
 	outputAccounts[string(tx.To.Value)] = &vmcommon.OutputAccount{
 		Address:      tx.To.Value,
 		BalanceDelta: tx.EGLDValue.Value,
@@ -216,7 +216,7 @@ func outOfFundsResult() *vmcommon.VMOutput {
 		ReturnMessage:   "",
 		GasRemaining:    0,
 		GasRefund:       big.NewInt(0),
-		OutputAccounts:  make(map[string]*vmcommon.OutputAccount),
+		OutputAccounts:  make(map[string]vmcommon.OutputAccountHandler),
 		DeletedAccounts: make([][]byte, 0),
 		TouchedAccounts: make([][]byte, 0),
 		Logs:            make([]*vmcommon.LogEntry, 0),
@@ -322,7 +322,7 @@ func (ae *ScenarioExecutor) updateStateAfterTx(
 	if tx.Type.HasSender() {
 		sumOfBalanceDeltas := big.NewInt(0)
 		for _, oa := range output.OutputAccounts {
-			sumOfBalanceDeltas = sumOfBalanceDeltas.Add(sumOfBalanceDeltas, oa.BalanceDelta)
+			sumOfBalanceDeltas = sumOfBalanceDeltas.Add(sumOfBalanceDeltas, oa.GetBalanceDelta())
 		}
 		if sumOfBalanceDeltas.Cmp(tx.EGLDValue.Value) != 0 {
 			return fmt.Errorf("sum of balance deltas should equal call value. Sum of balance deltas: %d (0x%x). Call value: %d (0x%x)",

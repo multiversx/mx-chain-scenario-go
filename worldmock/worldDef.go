@@ -55,6 +55,12 @@ type MockWorld struct {
 	ProvidedBlockchainHook     vmcommon.BlockchainHook
 	EnableEpochsHandler        vmcommon.EnableEpochsHandler
 	OtherVMOutputMap           map[string]*vmcommon.VMOutput
+	ChainIDValue               []byte
+}
+
+// ChainID return the chain id
+func (b *MockWorld) ChainID() []byte {
+	return b.ChainIDValue
 }
 
 // NewMockWorld creates a new MockWorld instance
